@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUNTO - Bylaws</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #64ffda;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .matrix-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 12px;
+            line-height: 1.2;
+            animation: matrix-fall linear infinite;
+            opacity: 0.1;
+        }
+
+        .highlight-char {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff, 0 0 30px #00d4ff;
+            font-size: 14px;
+            opacity: 0.3;
+        }
+
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 0.15; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 3px solid #00d4ff;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(0, 212, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-shadow: 0 0 10px #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .page-title {
+            color: #00d4ff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 60px #0066cc, 0 0 80px #0044aa; }
+        }
+
+        .breadcrumb {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #64ffda;
+            text-decoration: none;
+            text-shadow: 0 0 5px #64ffda;
+        }
+
+        .breadcrumb a:hover {
+            color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.95);
+            border: 3px solid #00d4ff;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 212, 255, 0.03) 50%, transparent 51%);
+            pointer-events: none;
+        }
+
+        .terminal-header {
+            background: rgba(15, 15, 15, 0.95);
+            border-bottom: 2px solid #00d4ff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: inset 0 1px 0 rgba(0, 212, 255, 0.2);
+        }
+
+        .terminal-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+
+        .control-btn:nth-child(2) { background: #ffbd2e; }
+        .control-btn:nth-child(3) { background: #27ca3f; }
+
+        .terminal-content {
+            padding: 30px;
+        }
+
+        .preamble {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .preamble-text {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            font-style: italic;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .bylaw-section {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+            border-left: 4px solid #00d4ff;
+            padding-left: 25px;
+            position: relative;
+            box-shadow: inset 4px 0 15px rgba(0, 212, 255, 0.1);
+        }
+
+        .bylaw-section:nth-child(1) { animation-delay: 0.2s; }
+        .bylaw-section:nth-child(2) { animation-delay: 0.4s; }
+        .bylaw-section:nth-child(3) { animation-delay: 0.6s; }
+        .bylaw-section:nth-child(4) { animation-delay: 0.8s; }
+        .bylaw-section:nth-child(5) { animation-delay: 1.0s; }
+        .bylaw-section:nth-child(6) { animation-delay: 1.2s; }
+        .bylaw-section:nth-child(7) { animation-delay: 1.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bylaw-section::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 10px;
+            width: 8px;
+            height: 8px;
+            background: #00d4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00d4ff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .bylaw-title {
+            color: #00d4ff;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .bylaw-content {
+            color: #64ffda;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .subsection {
+            margin-left: 20px;
+            margin-top: 15px;
+            padding-left: 15px;
+            border-left: 2px solid #333;
+        }
+
+        .subsection-title {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .subsection-content {
+            color: #888;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .bylaw-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .bylaw-list li {
+            color: #64ffda;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .bylaw-list li::before {
+            content: '▶';
+            color: #00d4ff;
+            position: absolute;
+            left: 0;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .amendment-section {
+            background: rgba(5, 5, 5, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .amendment-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .amendment-title {
+            color: #00d4ff;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .quote-section {
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.08), rgba(0, 212, 255, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .quote-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-author {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-footer {
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid #333;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #64ffda;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .nav-footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .terminal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-container" id="matrixContainer"></div>
+    
+    <header class="header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn">← Dashboard</a>
+            <h1 class="page-title">Organizational Bylaws</h1>
+        </div>
+        <div class="breadcrumb">
+            <a href="dashboard.html">Dashboard</a> / Bylaws
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">JUNTO Constitutional Framework</span>
+                <div class="terminal-controls">
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div class="preamble">
+                    <div class="preamble-text">
+                        We, the members of JUNTO, in order to form a more perfect union of minds, establish principles of intellectual freedom, ensure the pursuit of truth, provide for common enlightenment, promote the general wisdom, and secure the blessings of consciousness to ourselves and our posterity, do ordain and establish these Bylaws.
+                    </div>
+                </div>
+
+                <div class="bylaw-section">
+                    <h2 class="bylaw-title">Article I: Name and Purpose</h2>
+                    <div class="bylaw-content">
+                        The organization shall be known as JUNTO, dedicated to the cultivation of enlightened individuals and the advancement of human consciousness through ethical inquiry, civic engagement, and the preservation of fundamental freedoms.
+                    </div>
+                    <div class="subsection">
+                        <div class="subsection-title">Section 1.1: Core Mission</div>
+                        <div class="subsection-content">
+                            To foster intellectual and moral development, promote active civic participation, protect privacy and security, explore esoteric knowledge, and work toward the elevation of universal consciousness.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bylaw-section">
+                    <h2 class="bylaw-title">Article II: Membership</h2>
+                    <div class="bylaw-content">
+                        Membership in JUNTO is by invitation and consensus, extended to individuals who demonstrate commitment to our values and possess the intellectual capacity and moral character necessary for meaningful contribution.
+                    </div>
+                    <ul class="bylaw-list">
+                        <li>New members must be nominated by existing members and approved by consensus</li>
+                        <li>All members enjoy equal rights and responsibilities within the organization</li>
+                        <li>Membership may be suspended or revoked for violations of core principles</li>
+                        <li>Members are expected to maintain confidentiality of sensitive discussions</li>
+                    </ul>
+                </div>
+
+                <div class="bylaw-section">
+                    <h2 class="bylaw-title">Article III: Governance Structure</h2>
+                    <div class="bylaw-content">
+                        JUNTO operates under a distributed leadership model, with rotating responsibilities and collective decision-making to prevent concentration of power and ensure democratic participation.
+                    </div>
+                    <div class="subsection">
+                        <div class="subsection-title">Section 3.1: Leadership Roles</div>
+                        <div class="subsection-content">
+                            Leadership positions include Facilitator, Archivist, Guardian (Security), and Sage (Consciousness Studies). Terms are one year with possibility of renewal.
+                        </div>
+                    </div>
+                    <div class="subsection">
+                        <div class="subsection-title">Section 3.2: Decision Making</div>
+                        <div class="subsection-content">
+                            Major decisions require consensus among all members. Minor operational matters may be decided by simple majority vote.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bylaw-section">
+                    <h2 class="bylaw-title">Article IV: Meetings and Procedures</h2>
+                    <div class="bylaw-content">
+                        Regular meetings shall be held monthly, with additional sessions as needed. All meetings follow established protocols to ensure productive discourse and protect member privacy.
+                    </div>
+                    <ul class="bylaw-list">
+                        <li>Meetings may be conducted in person or through secure digital channels</li>
+                        <li>Agenda items must be submitted 48 hours in advance when possible</li>
+                        <li>Meeting notes are maintained but access is restricted to members only</li>
+                        <li>Emergency meetings may be called with 24-hour notice for urgent matters</li>
+                    </ul>
+                </div>
+
+                <div class="bylaw-section">
+                    <h2 class="bylaw-title">Article V: Code of Conduct</h2>
+                    <div class="bylaw-content">
+                        All members commit to upholding the highest standards of intellectual honesty, ethical behavior, and mutual respect in all interactions within and outside the organization.
+                    </div>
+                    <ul class="bylaw-list">
+                        <li>Engage in good faith discourse and remain open to changing perspectives</li>
+                        <li>Respect the privacy and confidentiality of fellow members</li>
+                        <li>Contribute meaningfully to discussions and organizational objectives</li>
+                        <li>Maintain the security of communication channels and sensitive information</li>
+                        <li>Act with integrity in all matters that may reflect upon the organization</li>
+                    </ul>
+                </div>
+
+                <div class="bylaw-section">
+                    <h2 class="bylaw-title">Article VI: Privacy and Security</h2>
+                    <div class="bylaw-content">
+                        Given our commitment to intellectual freedom and the sensitive nature of some discussions, strict protocols govern information security and member privacy protection.
+                    </div>
+                    <div class="subsection">
+                        <div class="subsection-title">Section 6.1: Information Classification</div>
+                        <div class="subsection-content">
+                            Information is classified as Public, Member-Only, or Restricted based on sensitivity and potential impact if disclosed.
+                        </div>
+                    </div>
+                    <div class="subsection">
+                        <div class="subsection-title">Section 6.2: Communication Security</div>
+                        <div class="subsection-content">
+                            All sensitive communications utilize end-to-end encryption and approved secure channels. Members receive training in operational security practices.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bylaw-section">
+                    <h2 class="bylaw-title">Article VII: Intellectual Property and Resources</h2>
+                    <div class="bylaw-content">
+                        Knowledge and insights developed through collective effort remain available to all members, while respecting individual contributions and external intellectual property rights.
+                    </div>
+                    <ul class="bylaw-list">
+                        <li>Research and analysis produced by the group is shared among members</li>
+                        <li>Individual members retain rights to their personal contributions</li>
+                        <li>External sources are properly attributed and copyright respected</li>
+                        <li>The knowledge repository is collectively maintained and updated</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="amendment-section">
+            <h3 class="amendment-title">Amendment Process</h3>
+            <div class="bylaw-content">
+                <strong>Article VIII: Amendments</strong><br><br>
+                These bylaws may be amended through a formal process requiring unanimous consent of all active members. Proposed amendments must be submitted in writing at least one week prior to discussion, allowing adequate time for consideration and debate. Emergency amendments may be considered with 72-hour notice in cases affecting member security or organizational integrity.
+            </div>
+        </div>
+
+        <div class="quote-section">
+            <div class="quote-text glitch" data-text='"The best way to find out if you can trust somebody is to trust them."'>
+                "The best way to find out if you can trust somebody is to trust them."
+            </div>
+            <div class="quote-author">— Ernest Hemingway</div>
+        </div>
+    </main>
+
+    <footer class="nav-footer">
+        <a href="leadership.html" class="nav-link">Next: Leadership →</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="objectives.html" class="nav-link">← Previous: Objectives</a>
+    </footer>
+
+    <script>
+        // Check authentication
+        if (!sessionStorage.getItem('juntoAuth')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Matrix rain effect
+        const matrixContainer = document.getElementById('matrixContainer');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+        const juntoChars = 'JUNTO';
+        
+        function createMatrixColumn() {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = Math.random() * 100 + '%';
+            column.style.animationDuration = (Math.random() * 5 + 4) + 's';
+            
+            let content = '';
+            const height = Math.floor(Math.random() * 12) + 6;
+            
+            for (let i = 0; i < height; i++) {
+                const shouldHighlight = Math.random() < 0.05;
+                if (shouldHighlight) {
+                    const juntoChar = juntoChars[Math.floor(Math.random() * juntoChars.length)];
+                    content += `<span class="highlight-char">${juntoChar}</span><br>`;
+                } else {
+                    content += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                }
+            }
+            
+            column.innerHTML = content;
+            matrixContainer.appendChild(column);
+            
+            setTimeout(() => {
+                column.remove();
+            }, 9000);
+        }
+        
+        setInterval(createMatrixColumn, 200);
+    </script>
+</body>
+</html>
