@@ -18,6 +18,8 @@
             overflow-x: hidden;
             height: 100vh;
             display: flex;
+            margin: 0;
+            padding: 0;
         }
 
         .matrix-container {
@@ -194,6 +196,7 @@
         .terminal-output {
             margin-bottom: 20px;
             min-height: 400px;
+            overflow: hidden;
         }
 
         .output-line {
@@ -326,6 +329,7 @@
             opacity: 0;
             transform: translateX(100%);
             transition: all 0.3s ease;
+            max-width: 250px;
         }
 
         .logout-warning.show {
@@ -365,6 +369,8 @@
             <a href="values.html" class="nav-item">Values</a>
             <a href="mission.html" class="nav-item">Mission</a>
             <a href="objectives.html" class="nav-item">Objectives</a>
+            <a href="bylaws.html" class="nav-item">Bylaws</a>
+            <a href="leadership.html" class="nav-item">Leadership</a>
             <a href="books.html" class="nav-item">Books</a>
             <a href="meeting-notes.html" class="nav-item">Meeting Notes</a>
         </div>
@@ -551,6 +557,8 @@
                     '  values          - Access organizational values',
                     '  mission         - View mission statement',
                     '  objectives      - Review current objectives',
+                    '  bylaws          - View organizational bylaws',
+                    '  leadership      - See current leadership',
                     '  books           - Browse reading list',
                     '  notes           - Access meeting notes',
                     '',
@@ -699,6 +707,16 @@
             objectives: () => {
                 window.location.href = 'objectives.html';
                 return 'Redirecting to Objectives...';
+            },
+            
+            bylaws: () => {
+                window.location.href = 'bylaws.html';
+                return 'Redirecting to Bylaws...';
+            },
+            
+            leadership: () => {
+                window.location.href = 'leadership.html';
+                return 'Redirecting to Leadership...';
             },
             
             books: () => {
