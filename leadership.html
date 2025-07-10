@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUNTO - Leadership</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #64ffda;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .matrix-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 12px;
+            line-height: 1.2;
+            animation: matrix-fall linear infinite;
+            opacity: 0.1;
+        }
+
+        .highlight-char {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff, 0 0 30px #00d4ff;
+            font-size: 14px;
+            opacity: 0.3;
+        }
+
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 0.15; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 3px solid #00d4ff;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(0, 212, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-shadow: 0 0 10px #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .page-title {
+            color: #00d4ff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 60px #0066cc, 0 0 80px #0044aa; }
+        }
+
+        .breadcrumb {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #64ffda;
+            text-decoration: none;
+            text-shadow: 0 0 5px #64ffda;
+        }
+
+        .breadcrumb a:hover {
+            color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.95);
+            border: 3px solid #00d4ff;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 212, 255, 0.03) 50%, transparent 51%);
+            pointer-events: none;
+        }
+
+        .terminal-header {
+            background: rgba(15, 15, 15, 0.95);
+            border-bottom: 2px solid #00d4ff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: inset 0 1px 0 rgba(0, 212, 255, 0.2);
+        }
+
+        .terminal-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+
+        .control-btn:nth-child(2) { background: #ffbd2e; }
+        .control-btn:nth-child(3) { background: #27ca3f; }
+
+        .terminal-content {
+            padding: 30px;
+        }
+
+        .leadership-intro {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .intro-text {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .leadership-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .leader-card {
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .leader-card:nth-child(1) { animation-delay: 0.2s; }
+        .leader-card:nth-child(2) { animation-delay: 0.4s; }
+        .leader-card:nth-child(3) { animation-delay: 0.6s; }
+        .leader-card:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .leader-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .leader-card:hover::before {
+            left: 100%;
+        }
+
+        .leader-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+            background: rgba(20, 20, 20, 0.9);
+        }
+
+        .leader-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .leader-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00d4ff, #0066cc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000;
+            margin-right: 20px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .leader-info {
+            flex: 1;
+        }
+
+        .leader-name {
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .leader-title {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .leader-term {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .leader-description {
+            color: #64ffda;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .leader-responsibilities {
+            background: rgba(5, 5, 5, 0.6);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .responsibilities-title {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .responsibility-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .responsibility-list li {
+            color: #888;
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+            font-size: 0.85rem;
+        }
+
+        .responsibility-list li::before {
+            content: '●';
+            color: #00d4ff;
+            position: absolute;
+            left: 0;
+            text-shadow: 0 0 5px #00d4ff;
+        }
+
+        .council-section {
+            background: rgba(5, 5, 5, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .council-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .council-title {
+            color: #00d4ff;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .council-description {
+            color: #64ffda;
+            line-height: 1.7;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .council-principles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .principle-item {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .principle-item:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .principle-icon {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        .principle-name {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .principle-desc {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .quote-section {
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.08), rgba(0, 212, 255, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .quote-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-author {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-footer {
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid #333;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #64ffda;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .leadership-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .council-principles {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .terminal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-container" id="matrixContainer"></div>
+    
+    <header class="header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn">← Dashboard</a>
+            <h1 class="page-title">Leadership Council</h1>
+        </div>
+        <div class="breadcrumb">
+            <a href="dashboard.html">Dashboard</a> / Leadership
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">JUNTO Leadership Directory</span>
+                <div class="terminal-controls">
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div class="leadership-intro">
+                    <div class="intro-text">
+                        JUNTO operates under a distributed leadership model, with roles rotating annually to prevent power concentration. Each leader brings unique expertise while maintaining collective decision-making authority and shared responsibility for our mission.
+                    </div>
+                </div>
+
+                <div class="leadership-grid">
+                    <div class="leader-card">
+                        <div class="leader-header">
+                            <div class="leader-avatar">NP</div>
+                            <div class="leader-info">
+                                <div class="leader-name">Neo-Prometheus</div>
+                                <div class="leader-title">Facilitator</div>
+                                <div class="leader-term">Term: 2025-2026</div>
+                            </div>
+                        </div>
+                        <div class="leader-description">
+                            Coordinates group activities, facilitates discussions, and ensures productive dialogue. Acts as primary liaison for external communications and maintains organizational focus on core objectives.
+                        </div>
+                        <div class="leader-responsibilities">
+                            <div class="responsibilities-title">Key Responsibilities:</div>
+                            <ul class="responsibility-list">
+                                <li>Meeting facilitation and agenda coordination</li>
+                                <li>Conflict resolution and consensus building</li>
+                                <li>External partnership development</li>
+                                <li>Strategic planning oversight</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="leader-card">
+                        <div class="leader-header">
+                            <div class="leader-avatar">CW</div>
+                            <div class="leader-info">
+                                <div class="leader-name">Cipher-Weaver</div>
+                                <div class="leader-title">Guardian (Security)</div>
+                                <div class="leader-term">Term: 2025-2026</div>
+                            </div>
+                        </div>
+                        <div class="leader-description">
+                            Oversees information security, privacy protection, and operational security measures. Manages secure communication channels and ensures member safety in digital and physical spaces.
+                        </div>
+                        <div class="leader-responsibilities">
+                            <div class="responsibilities-title">Key Responsibilities:</div>
+                            <ul class="responsibility-list">
+                                <li>Security protocol development and maintenance</li>
+                                <li>Communication platform administration</li>
+                                <li>Privacy advocacy and research</li>
+                                <li>Member security training</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="leader-card">
+                        <div class="leader-header">
+                            <div class="leader-avatar">DM</div>
+                            <div class="leader-info">
+                                <div class="leader-name">Data-Mystic</div>
+                                <div class="leader-title">Archivist</div>
+                                <div class="leader-term">Term: 2025-2026</div>
+                            </div>
+                        </div>
+                        <div class="leader-description">
+                            Maintains the knowledge repository, organizes research materials, and preserves institutional memory. Curates reading lists and manages the collective intellectual resources of the group.
+                        </div>
+                        <div class="leader-responsibilities">
+                            <div class="responsibilities-title">Key Responsibilities:</div>
+                            <ul class="responsibility-list">
+                                <li>Knowledge repository management</li>
+                                <li>Research coordination and documentation</li>
+                                <li>Meeting notes and record keeping</li>
+                                <li>Educational resource curation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="leader-card">
+                        <div class="leader-header">
+                            <div class="leader-avatar">QS</div>
+                            <div class="leader-info">
+                                <div class="leader-name">Quantum-Sage</div>
+                                <div class="leader-title">Sage (Consciousness Studies)</div>
+                                <div class="leader-term">Term: 2025-2026</div>
+                            </div>
+                        </div>
+                        <div class="leader-description">
+                            Guides consciousness exploration activities, esoteric studies, and spiritual development programs. Facilitates meditation sessions and oversees the integration of mystical practices with intellectual pursuits.
+                        </div>
+                        <div class="leader-responsibilities">
+                            <div class="responsibilities-title">Key Responsibilities:</div>
+                            <ul class="responsibility-list">
+                                <li>Consciousness practice facilitation</li>
+                                <li>Esoteric curriculum development</li>
+                                <li>Meditation and mindfulness guidance</li>
+                                <li>Spiritual integration support</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="council-section">
+            <h3 class="council-title">Leadership Principles</h3>
+            <div class="council-description">
+                Our leadership operates on principles of rotation, transparency, and collective wisdom. Power is distributed to prevent corruption and ensure that multiple perspectives guide our decisions.
+            </div>
+            <div class="council-principles">
+                <div class="principle-item">
+                    <div class="principle-icon">⚖️</div>
+                    <div class="principle-name">Distributed Authority</div>
+                    <div class="principle-desc">No single individual holds absolute power</div>
+                </div>
+                <div class="principle-item">
+                    <div class="principle-icon">🔄</div>
+                    <div class="principle-name">Term Rotation</div>
+                    <div class="principle-desc">Annual rotation prevents power entrenchment</div>
+                </div>
+                <div class="principle-item">
+                    <div class="principle-icon">🤝</div>
+                    <div class="principle-name">Consensus Building</div>
+                    <div class="principle-desc">Major decisions require group agreement</div>
+                </div>
+                <div class="principle-item">
+                    <div class="principle-icon">🎯</div>
+                    <div class="principle-name">Specialized Expertise</div>
+                    <div class="principle-desc">Leaders chosen for relevant skills and knowledge</div>
+                </div>
+                <div class="principle-item">
+                    <div class="principle-icon">📊</div>
+                    <div class="principle-name">Transparent Accountability</div>
+                    <div class="principle-desc">Open reporting and member oversight</div>
+                </div>
+                <div class="principle-item">
+                    <div class="principle-icon">🌱</div>
+                    <div class="principle-name">Servant Leadership</div>
+                    <div class="principle-desc">Leaders serve the group, not themselves</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-section">
+            <div class="quote-text glitch" data-text='"The best executive is the one who has sense enough to pick good men to do what he wants done, and self-restraint enough to keep from meddling with them while they do it."'>
+                "The best executive is the one who has sense enough to pick good men to do what he wants done, and self-restraint enough to keep from meddling with them while they do it."
+            </div>
+            <div class="quote-author">— Theodore Roosevelt</div>
+        </div>
+    </main>
+
+    <footer class="nav-footer">
+        <a href="books.html" class="nav-link">Next: Books →</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="bylaws.html" class="nav-link">← Previous: Bylaws</a>
+    </footer>
+
+    <script>
+        // Check authentication
+        if (!sessionStorage.getItem('juntoAuth')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Matrix rain effect
+        const matrixContainer = document.getElementById('matrixContainer');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+        const juntoChars = 'JUNTO';
+        
+        function createMatrixColumn() {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = Math.random() * 100 + '%';
+            column.style.animationDuration = (Math.random() * 5 + 4) + 's';
+            
+            let content = '';
+            const height = Math.floor(Math.random() * 12) + 6;
+            
+            for (let i = 0; i < height; i++) {
+                const shouldHighlight = Math.random() < 0.05;
+                if (shouldHighlight) {
+                    const juntoChar = juntoChars[Math.floor(Math.random() * juntoChars.length)];
+                    content += `<span class="highlight-char">${juntoChar}</span><br>`;
+                } else {
+                    content += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                }
+            }
+            
+            column.innerHTML = content;
+            matrixContainer.appendChild(column);
+            
+            setTimeout(() => {
+                column.remove();
+            }, 9000);
+        }
+        
+        setInterval(createMatrixColumn, 200);
+        
+        // Add interactive effects
+        document.querySelectorAll('.leader-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>
