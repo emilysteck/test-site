@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUNTO - Books</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #64ffda;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .matrix-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 12px;
+            line-height: 1.2;
+            animation: matrix-fall linear infinite;
+            opacity: 0.1;
+        }
+
+        .highlight-char {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff, 0 0 30px #00d4ff;
+            font-size: 14px;
+            opacity: 0.3;
+        }
+
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 0.15; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 3px solid #00d4ff;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(0, 212, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-shadow: 0 0 10px #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .page-title {
+            color: #00d4ff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 60px #0066cc, 0 0 80px #0044aa; }
+        }
+
+        .breadcrumb {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #64ffda;
+            text-decoration: none;
+            text-shadow: 0 0 5px #64ffda;
+        }
+
+        .breadcrumb a:hover {
+            color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.95);
+            border: 3px solid #00d4ff;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 212, 255, 0.03) 50%, transparent 51%);
+            pointer-events: none;
+        }
+
+        .terminal-header {
+            background: rgba(15, 15, 15, 0.95);
+            border-bottom: 2px solid #00d4ff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: inset 0 1px 0 rgba(0, 212, 255, 0.2);
+        }
+
+        .terminal-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+
+        .control-btn:nth-child(2) { background: #ffbd2e; }
+        .control-btn:nth-child(3) { background: #27ca3f; }
+
+        .terminal-content {
+            padding: 30px;
+        }
+
+        .library-intro {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .intro-text {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .category-section {
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .category-section:nth-child(1) { animation-delay: 0.2s; }
+        .category-section:nth-child(2) { animation-delay: 0.4s; }
+        .category-section:nth-child(3) { animation-delay: 0.6s; }
+        .category-section:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-header::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .category-title {
+            color: #00d4ff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .category-description {
+            color: #ffffff;
+            line-height: 1.6;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .book-card {
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .book-card:hover::before {
+            left: 100%;
+        }
+
+        .book-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+            background: rgba(20, 20, 20, 0.9);
+        }
+
+        .book-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .book-cover {
+            width: 60px;
+            height: 90px;
+            background: linear-gradient(135deg, #00d4ff, #0066cc);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #000;
+            margin-right: 20px;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            text-align: center;
+            padding: 5px;
+        }
+
+        .book-info {
+            flex: 1;
+        }
+
+        .book-title {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .book-author {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            margin-bottom: 8px;
+        }
+
+        .book-year {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .book-description {
+            color: #64ffda;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .book-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .book-tag {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .book-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-current {
+            background: rgba(39, 202, 63, 0.2);
+            color: #27ca3f;
+            border: 1px solid rgba(39, 202, 63, 0.3);
+        }
+
+        .status-recommended {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .status-advanced {
+            background: rgba(255, 189, 46, 0.2);
+            color: #ffbd2e;
+            border: 1px solid rgba(255, 189, 46, 0.3);
+        }
+
+        .discussion-link {
+            color: #888;
+            font-size: 0.8rem;
+            text-decoration: none;
+            border: 1px solid #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .discussion-link:hover {
+            color: #00d4ff;
+            border-color: #00d4ff;
+        }
+
+        .reading-schedule {
+            background: rgba(5, 5, 5, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .reading-schedule::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .schedule-title {
+            color: #00d4ff;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .schedule-item {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .schedule-month {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .schedule-book {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .schedule-author {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .quote-section {
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.08), rgba(0, 212, 255, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .quote-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-author {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-footer {
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid #333;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #64ffda;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .terminal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-container" id="matrixContainer"></div>
+    
+    <header class="header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn">← Dashboard</a>
+            <h1 class="page-title">Essential Reading List</h1>
+        </div>
+        <div class="breadcrumb">
+            <a href="dashboard.html">Dashboard</a> / Books
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">Essential Reading List</span>
+                <div class="terminal-controls">
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div class="library-intro">
+                    <div class="intro-text">
+                        A carefully curated collection of essential texts for intellectual development, consciousness expansion, and the pursuit of wisdom. These books form the foundation of our collective understanding and ongoing discussions.
+                    </div>
+                </div>
+
+                <div class="category-section">
+                    <div class="category-header">
+                        <h2 class="category-title">📚 Philosophy & Consciousness</h2>
+                        <p class="category-description">
+                            Foundational works exploring the nature of reality, consciousness, and human existence.
+                        </p>
+                    </div>
+                    <div class="books-grid">
+                        <div class="book-card">
+                            <div class="book-header">
+                                <div class="book-cover">GEB</div>
+                                <div class="book-info">
+                                    <div class="book-title">Gödel, Escher, Bach</div>
+                                    <div class="book-author">Douglas Hofstadter</div>
+                                    <div class="book-year">1979</div>
+                                </div>
+                            </div>
+                            <div class="book-description">
+                                An eternal golden braid exploring consciousness, self-reference, and strange loops through mathematics, art, and music. Essential reading for understanding the nature of mind and reality.
+                            </div>
+                            <div class="book-tags">
+                                <span class="book-tag">Consciousness</span>
+                                <span class="book-tag">Mathematics</span>
+                                <span class="book-tag">Self-Reference</span>
+                            </div>
+                            <div class="book-status">
+                                <span class="status-badge status-current">Currently Reading</span>
+                                <a href="#" class="discussion-link">📥 Download PDF</a>
+                            </div>
+                        </div>
+
+                        <div class="book-card">
+                            <div class="book-header">
+                                <div class="book-cover">BLOOD</div>
+                                <div class="book-info">
+                                    <div class="book-title">Blood Meridian</div>
+                                    <div class="book-author">Cormac McCarthy</div>
+                                    <div class="book-year">1985</div>
+                                </div>
+                            </div>
+                            <div class="book-description">
+                                A brutal and philosophical exploration of violence, morality, and the human condition set in the American frontier. McCarthy's masterpiece challenges readers to confront darkness and meaning.
+                            </div>
+                            <div class="book-tags">
+                                <span class="book-tag">Philosophy</span>
+                                <span class="book-tag">Violence</span>
+                                <span class="book-tag">Morality</span>
+                            </div>
+                            <div class="book-status">
+                                <span class="status-badge status-recommended">Recommended</span>
+                                <a href="#" class="discussion-link">📥 Download PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-section">
+                    <div class="category-header">
+                        <h2 class="category-title">🔐 Privacy & Technology</h2>
+                        <p class="category-description">
+                            Understanding surveillance, digital rights, and maintaining privacy in the modern world.
+                        </p>
+                    </div>
+                    <div class="books-grid">
+                        <div class="book-card">
+                            <div class="book-header">
+                                <div class="book-cover">1984</div>
+                                <div class="book-info">
+                                    <div class="book-title">Nineteen Eighty-Four</div>
+                                    <div class="book-author">George Orwell</div>
+                                    <div class="book-year">1949</div>
+                                </div>
+                            </div>
+                            <div class="book-description">
+                                A prophetic vision of totalitarian surveillance and the importance of protecting truth, language, and individual thought from state manipulation.
+                            </div>
+                            <div class="book-tags">
+                                <span class="book-tag">Surveillance</span>
+                                <span class="book-tag">Totalitarianism</span>
+                                <span class="book-tag">Truth</span>
+                            </div>
+                            <div class="book-status">
+                                <span class="status-badge status-recommended">Essential</span>
+                                <a href="#" class="discussion-link">📥 Download PDF</a>
+                            </div>
+                        </div>
+
+                        <div class="book-card">
+                            <div class="book-header">
+                                <div class="book-cover">CRYPTO</div>
+                                <div class="book-info">
+                                    <div class="book-title">The Codebreakers</div>
+                                    <div class="book-author">David Kahn</div>
+                                    <div class="book-year">1967</div>
+                                </div>
+                            </div>
+                            <div class="book-description">
+                                The comprehensive history of cryptography and code-breaking, essential for understanding the tools that protect privacy and secure communication.
+                            </div>
+                            <div class="book-tags">
+                                <span class="book-tag">Cryptography</span>
+                                <span class="book-tag">Security</span>
+                                <span class="book-tag">History</span>
+                            </div>
+                            <div class="book-status">
+                                <span class="status-badge status-advanced">Reference</span>
+                                <a href="#" class="discussion-link">📥 Download PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-section">
+                    <div class="category-header">
+                        <h2 class="category-title">🔮 Esoteric & Hidden Knowledge</h2>
+                        <p class="category-description">
+                            Ancient wisdom traditions, mystical texts, and explorations of hidden knowledge systems.
+                        </p>
+                    </div>
+                    <div class="books-grid">
+                        <div class="book-card">
+                            <div class="book-header">
+                                <div class="book-cover">KYBALION</div>
+                                <div class="book-info">
+                                    <div class="book-title">The Kybalion</div>
+                                    <div class="book-author">Three Initiates</div>
+                                    <div class="book-year">1908</div>
+                                </div>
+                            </div>
+                            <div class="book-description">
+                                A study of the Hermetic philosophy of ancient Egypt and Greece, presenting seven fundamental principles that govern all existence and consciousness.
+                            </div>
+                            <div class="book-tags">
+                                <span class="book-tag">Hermeticism</span>
+                                <span class="book-tag">Universal Laws</span>
+                                <span class="book-tag">Ancient Wisdom</span>
+                            </div>
+                            <div class="book-status">
+                                <span class="status-badge status-recommended">Study Group</span>
+                                <a href="#" class="discussion-link">📥 Download PDF</a>
+                            </div>
+                        </div>
+
+                        <div class="book-card">
+                            <div class="book-header">
+                                <div class="book-cover">DOORS</div>
+                                <div class="book-info">
+                                    <div class="book-title">The Doors of Perception</div>
+                                    <div class="book-author">Aldous Huxley</div>
+                                    <div class="book-year">1954</div>
+                                </div>
+                            </div>
+                            <div class="book-description">
+                                An exploration of consciousness expansion and the nature of perception, examining how altered states can reveal deeper truths about reality.
+                            </div>
+                            <div class="book-tags">
+                                <span class="book-tag">Consciousness</span>
+                                <span class="book-tag">Perception</span>
+                                <span class="book-tag">Mysticism</span>
+                            </div>
+                            <div class="book-status">
+                                <span class="status-badge status-advanced">Advanced Study</span>
+                                <a href="#" class="discussion-link">📥 Download PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-section">
+                    <div
