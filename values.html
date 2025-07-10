@@ -43,9 +43,9 @@
         .highlight-char {
             color: #00d4ff;
             font-weight: bold;
-            text-shadow: 0 0 10px #00d4ff;
+            text-shadow: 0 0 15px #00d4ff, 0 0 30px #00d4ff;
             font-size: 14px;
-            opacity: 0.2;
+            opacity: 0.3;
         }
 
         @keyframes matrix-fall {
@@ -55,45 +55,49 @@
 
         .header {
             background: rgba(10, 10, 10, 0.95);
-            border-bottom: 2px solid #00d4ff;
+            border-bottom: 3px solid #00d4ff;
             padding: 15px 20px;
             position: relative;
             z-index: 2;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 212, 255, 0.2);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(0, 212, 255, 0.1);
         }
 
         .back-btn {
             background: transparent;
-            border: 1px solid #00d4ff;
+            border: 2px solid #00d4ff;
             color: #00d4ff;
-            padding: 8px 15px;
+            padding: 10px 18px;
             border-radius: 4px;
             font-family: 'Courier New', monospace;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            text-shadow: 0 0 10px #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
         }
 
         .back-btn:hover {
-            background: rgba(0, 212, 255, 0.1);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
         }
 
         .page-title {
             color: #00d4ff;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            text-shadow: 0 0 10px #00d4ff;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 60px #0066cc, 0 0 80px #0044aa; }
         }
 
         .breadcrumb {
@@ -104,10 +108,12 @@
         .breadcrumb a {
             color: #64ffda;
             text-decoration: none;
+            text-shadow: 0 0 5px #64ffda;
         }
 
         .breadcrumb a:hover {
             color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
         }
 
         .main-content {
@@ -122,25 +128,40 @@
 
         .terminal-window {
             background: rgba(10, 10, 10, 0.95);
-            border: 2px solid #00d4ff;
+            border: 3px solid #00d4ff;
             border-radius: 8px;
             margin-bottom: 30px;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 212, 255, 0.05);
             overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 212, 255, 0.03) 50%, transparent 51%);
+            pointer-events: none;
         }
 
         .terminal-header {
             background: rgba(15, 15, 15, 0.95);
-            border-bottom: 1px solid #00d4ff;
+            border-bottom: 2px solid #00d4ff;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: inset 0 1px 0 rgba(0, 212, 255, 0.2);
         }
 
         .terminal-title {
             color: #00d4ff;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
         }
 
         .terminal-controls {
@@ -175,6 +196,7 @@
         .value-item:nth-child(3) { animation-delay: 0.6s; }
         .value-item:nth-child(4) { animation-delay: 0.8s; }
         .value-item:nth-child(5) { animation-delay: 1.0s; }
+        .value-item:nth-child(6) { animation-delay: 1.2s; }
 
         @keyframes fadeInUp {
             from {
@@ -188,24 +210,27 @@
         }
 
         .value-title {
-            color: #00d4ff;
-            font-size: 1.3rem;
+            color: #ffffff;
+            font-size: 1.4rem;
             margin-bottom: 15px;
-            text-shadow: 0 0 5px #00d4ff;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .value-description {
-            color: #64ffda;
-            line-height: 1.6;
+            color: #b8c5d1;
+            line-height: 1.7;
             margin-bottom: 15px;
+            font-weight: 400;
         }
 
         .value-principle {
-            color: #888;
+            color: #7a8792;
             font-style: italic;
             border-left: 2px solid #333;
             padding-left: 15px;
             margin-top: 10px;
+            font-weight: 300;
         }
 
         .core-principles {
@@ -217,10 +242,12 @@
         }
 
         .principles-title {
-            color: #00d4ff;
+            color: #ffffff;
             font-size: 1.2rem;
             margin-bottom: 20px;
             text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .principle-grid {
@@ -253,41 +280,69 @@
 
         .principle-name {
             color: #ffffff;
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 8px;
+            font-size: 0.95rem;
         }
 
         .principle-desc {
-            color: #888;
-            font-size: 0.9rem;
+            color: #7a8792;
+            font-size: 0.85rem;
+            font-weight: 400;
         }
 
         .quote-section {
-            background: linear-gradient(45deg, rgba(0, 212, 255, 0.05), rgba(0, 212, 255, 0.1));
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 6px;
-            padding: 25px;
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.08), rgba(0, 212, 255, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            padding: 30px;
             margin: 30px 0;
             text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .quote-text {
             color: #ffffff;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-style: italic;
             margin-bottom: 15px;
-            line-height: 1.5;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         .quote-author {
             color: #00d4ff;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            position: relative;
+            z-index: 1;
         }
 
         .nav-footer {
-            background: rgba(10, 10, 10, 0.95);
-            border-top: 1px solid #333;
-            padding: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border-top: 1px solid #30363d;
+            padding: 24px;
             position: relative;
             z-index: 2;
             display: flex;
@@ -296,18 +351,20 @@
         }
 
         .nav-link {
-            color: #64ffda;
+            color: #c9d1d9;
             text-decoration: none;
-            padding: 8px 15px;
+            padding: 10px 16px;
             border: 1px solid transparent;
-            border-radius: 4px;
-            transition: all 0.3s ease;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 14px;
         }
 
         .nav-link:hover {
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
-            color: #ffffff;
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.1);
+            color: #f0f6fc;
         }
 
         .glitch {
@@ -326,31 +383,31 @@
         }
 
         .glitch::before {
-            animation: glitch-1 2s infinite linear alternate-reverse;
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
             color: #ff00ff;
             z-index: -1;
         }
 
         .glitch::after {
-            animation: glitch-2 2s infinite linear alternate-reverse;
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
             color: #00ffff;
             z-index: -2;
         }
 
         @keyframes glitch-1 {
             0%, 100% { transform: translate(0); }
-            20% { transform: translate(-1px, 1px); }
-            40% { transform: translate(-1px, -1px); }
-            60% { transform: translate(1px, 1px); }
-            80% { transform: translate(1px, -1px); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
         }
 
         @keyframes glitch-2 {
             0%, 100% { transform: translate(0); }
-            20% { transform: translate(1px, 1px); }
-            40% { transform: translate(1px, -1px); }
-            60% { transform: translate(-1px, 1px); }
-            80% { transform: translate(-1px, -1px); }
+            20% { transform: translate(2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
         }
 
         @media (max-width: 768px) {
@@ -384,7 +441,7 @@
     
     <header class="header">
         <div class="header-left">
-            <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+            <a href="dashboard.html" class="back-btn">← Dashboard</a>
             <h1 class="page-title">Organizational Values</h1>
         </div>
         <div class="breadcrumb">
@@ -404,52 +461,62 @@
             </div>
             <div class="terminal-content">
                 <div class="value-item">
-                    <h2 class="value-title">📚 Intellectual Curiosity</h2>
+                    <h2 class="value-title">🧠 Moral and Intellectual Development</h2>
                     <p class="value-description">
-                        We believe in the endless pursuit of knowledge and understanding. Every question leads to deeper mysteries, every answer opens new doors of inquiry. We embrace the unknown with excitement rather than fear.
+                        We are committed to the continuous development of both our moral compass and intellectual capacity. Growth in wisdom requires the integration of knowledge with ethical understanding, creating individuals capable of thoughtful action.
                     </p>
                     <div class="value-principle">
-                        "The important thing is not to stop questioning. Curiosity has its own reason for existing."
+                        "The unexamined life is not worth living, but the examined life must be lived with purpose."
                     </div>
                 </div>
 
                 <div class="value-item">
-                    <h2 class="value-title">🔄 Strange Loops & Recursion</h2>
+                    <h2 class="value-title">🏛️ Civic Responsibility</h2>
                     <p class="value-description">
-                        Inspired by Hofstadter's work, we recognize that the most profound truths often emerge from self-referential systems. We value circular thinking that builds understanding through iteration and reflection.
+                        We believe in active engagement with our communities and society at large. True citizenship requires more than passive participation - it demands thoughtful contribution to the common good and the courage to stand for justice.
                     </p>
                     <div class="value-principle">
-                        "I am a strange loop" - and so are the best ideas, the deepest insights, and the most meaningful connections.
+                        "The price of freedom is eternal vigilance and active participation in the democratic process."
                     </div>
                 </div>
 
                 <div class="value-item">
-                    <h2 class="value-title">🤝 Collective Intelligence</h2>
+                    <h2 class="value-title">🔍 Free Inquiry</h2>
                     <p class="value-description">
-                        No single mind can grasp the full complexity of our world. We value collaborative thinking, where diverse perspectives combine to create understanding greater than the sum of its parts.
+                        We champion the unrestricted pursuit of truth and knowledge. Every question deserves investigation, every assumption deserves challenge, and every established truth deserves re-examination through the lens of new evidence.
                     </p>
                     <div class="value-principle">
-                        "The whole is greater than the sum of its parts" - true for both minds and ideas.
+                        "Question everything, accept nothing without evidence, and remain open to changing your mind."
                     </div>
                 </div>
 
                 <div class="value-item">
-                    <h2 class="value-title">🔐 Thoughtful Discretion</h2>
+                    <h2 class="value-title">🕊️ Freedom and Tolerance</h2>
                     <p class="value-description">
-                        Some ideas need time to develop in safe spaces before facing the world. We value the ability to think freely without judgment, to explore controversial concepts, and to change our minds without losing face.
+                        We defend the fundamental rights of all individuals to live, think, and express themselves freely. True tolerance means protecting the rights of those with whom we disagree, while maintaining our own convictions.
                     </p>
                     <div class="value-principle">
-                        "The best conversations happen in trusted circles where vulnerability becomes strength."
+                        "I may disagree with what you say, but I will defend to the death your right to say it."
                     </div>
                 </div>
 
                 <div class="value-item">
-                    <h2 class="value-title">⚡ Emergent Thinking</h2>
+                    <h2 class="value-title">🔐 Privacy and Security</h2>
                     <p class="value-description">
-                        We value ideas that arise organically from interaction rather than imposed from authority. The best insights emerge when minds connect in unexpected ways, creating new patterns of thought.
+                        In an age of surveillance and data exploitation, we fiercely protect the right to think freely and communicate securely. Privacy is not about hiding; it's about preserving the space for authentic growth and expression.
                     </p>
                     <div class="value-principle">
-                        "Emergence is the magic that happens when simple rules create complex beauty."
+                        "Privacy is the foundation of human dignity and the prerequisite for authentic self-development."
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <h2 class="value-title">🔮 Esoteric Knowledge and Raising Universal Consciousness</h2>
+                    <p class="value-description">
+                        We seek wisdom beyond the conventional, exploring the deeper mysteries of existence and consciousness. Through the pursuit of hidden knowledge and expanded awareness, we work to elevate not just ourselves but all of humanity.
+                    </p>
+                    <div class="value-principle">
+                        "The mystic swims in the same waters in which the psychotic drowns - but the mystic has learned to swim."
                     </div>
                 </div>
             </div>
@@ -466,34 +533,34 @@
             <h3 class="principles-title">Our Operating Principles</h3>
             <div class="principle-grid">
                 <div class="principle-card">
-                    <div class="principle-icon">🧠</div>
-                    <div class="principle-name">Growth Mindset</div>
-                    <div class="principle-desc">Every mistake is data, every failure is feedback</div>
+                    <div class="principle-icon">📖</div>
+                    <div class="principle-name">Lifelong Learning</div>
+                    <div class="principle-desc">Commit to continuous moral and intellectual growth</div>
                 </div>
                 <div class="principle-card">
-                    <div class="principle-icon">🔍</div>
-                    <div class="principle-name">Deep Inquiry</div>
-                    <div class="principle-desc">Ask "why" three times, then ask "what if"</div>
+                    <div class="principle-icon">⚖️</div>
+                    <div class="principle-name">Ethical Action</div>
+                    <div class="principle-desc">Let wisdom guide decisions and moral courage drive action</div>
                 </div>
                 <div class="principle-card">
                     <div class="principle-icon">🌐</div>
-                    <div class="principle-name">Systems Thinking</div>
-                    <div class="principle-desc">Everything connects to everything else</div>
+                    <div class="principle-name">Active Citizenship</div>
+                    <div class="principle-desc">Engage meaningfully in the democratic process</div>
                 </div>
                 <div class="principle-card">
-                    <div class="principle-icon">💡</div>
-                    <div class="principle-name">Creative Synthesis</div>
-                    <div class="principle-desc">Combine old ideas to create new possibilities</div>
+                    <div class="principle-icon">🔍</div>
+                    <div class="principle-name">Fearless Inquiry</div>
+                    <div class="principle-desc">Question assumptions and seek truth without limits</div>
                 </div>
                 <div class="principle-card">
-                    <div class="principle-icon">🎭</div>
-                    <div class="principle-name">Intellectual Humility</div>
-                    <div class="principle-desc">Strong opinions, loosely held</div>
+                    <div class="principle-icon">🛡️</div>
+                    <div class="principle-name">Defend Liberty</div>
+                    <div class="principle-desc">Protect freedom of thought and expression for all</div>
                 </div>
                 <div class="principle-card">
-                    <div class="principle-icon">🔗</div>
-                    <div class="principle-name">Authentic Connection</div>
-                    <div class="principle-desc">Real relationships over networking</div>
+                    <div class="principle-icon">🌟</div>
+                    <div class="principle-name">Consciousness Expansion</div>
+                    <div class="principle-desc">Seek hidden knowledge to elevate universal awareness</div>
                 </div>
             </div>
         </div>
