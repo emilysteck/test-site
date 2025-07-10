@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUNTO - About</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #64ffda;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .matrix-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 12px;
+            line-height: 1.2;
+            animation: matrix-fall linear infinite;
+            opacity: 0.1;
+        }
+
+        .highlight-char {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff, 0 0 30px #00d4ff;
+            font-size: 14px;
+            opacity: 0.3;
+        }
+
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 0.15; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 3px solid #00d4ff;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(0, 212, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-shadow: 0 0 10px #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .page-title {
+            color: #00d4ff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 60px #0066cc, 0 0 80px #0044aa; }
+        }
+
+        .breadcrumb {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #64ffda;
+            text-decoration: none;
+            text-shadow: 0 0 5px #64ffda;
+        }
+
+        .breadcrumb a:hover {
+            color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.95);
+            border: 3px solid #00d4ff;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 212, 255, 0.03) 50%, transparent 51%);
+            pointer-events: none;
+        }
+
+        .terminal-header {
+            background: rgba(15, 15, 15, 0.95);
+            border-bottom: 2px solid #00d4ff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: inset 0 1px 0 rgba(0, 212, 255, 0.2);
+        }
+
+        .terminal-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+
+        .control-btn:nth-child(2) { background: #ffbd2e; }
+        .control-btn:nth-child(3) { background: #27ca3f; }
+
+        .terminal-content {
+            padding: 30px;
+        }
+
+        .mission-statement {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-statement::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .mission-text {
+            color: #ffffff;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .mission-tagline {
+            color: #00d4ff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+            font-style: italic;
+        }
+
+        .objective-section {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+            border-left: 4px solid #00d4ff;
+            padding-left: 25px;
+            position: relative;
+            box-shadow: inset 4px 0 15px rgba(0, 212, 255, 0.1);
+        }
+
+        .objective-section:nth-child(3) { animation-delay: 0.2s; }
+        .objective-section:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .objective-section::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 10px;
+            width: 8px;
+            height: 8px;
+            background: #00d4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00d4ff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .objective-title {
+            color: #00d4ff;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .objective-details {
+            background: rgba(5, 5, 5, 0.6);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .detail-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .detail-list li {
+            color: #888;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .detail-list li::before {
+            content: '▶';
+            color: #00d4ff;
+            position: absolute;
+            left: 0;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .impact-metrics {
+            background: rgba(5, 5, 5, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .impact-metrics::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .metrics-title {
+            color: #00d4ff;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .metric-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .metric-number {
+            color: #00d4ff;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .metric-description {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .value-item {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+            border-left: 3px solid #00d4ff;
+            padding-left: 20px;
+        }
+
+        .value-item:nth-child(1) { animation-delay: 0.2s; }
+        .value-item:nth-child(2) { animation-delay: 0.4s; }
+        .value-item:nth-child(3) { animation-delay: 0.6s; }
+        .value-item:nth-child(4) { animation-delay: 0.8s; }
+        .value-item:nth-child(5) { animation-delay: 1.0s; }
+        .value-item:nth-child(6) { animation-delay: 1.2s; }
+
+        .value-title {
+            color: #ffffff;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .value-description {
+            color: #b8c5d1;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .value-principle {
+            color: #7a8792;
+            font-style: italic;
+            border-left: 2px solid #333;
+            padding-left: 15px;
+            margin-top: 10px;
+            font-weight: 300;
+        }
+
+        .historical-inspiration {
+            background: rgba(5, 5, 5, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 35px;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .historical-inspiration::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        .inspiration-title {
+            color: #00d4ff;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+            letter-spacing: 1px;
+        }
+
+        .inspiration-intro {
+            margin-bottom: 30px;
+        }
+
+        .intro-text {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .franklin-quote-box {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .franklin-quote-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.02) 0%, transparent 70%);
+            animation: rotate 25s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .franklin-quote {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .franklin-attribution {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .qualifications-section {
+            margin: 35px 0;
+        }
+
+        .qualifications-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .qualifications-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .qualification-card {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qualification-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .qualification-card:hover::before {
+            left: 100%;
+        }
+
+        .qualification-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .qualification-number {
+            color: #00d4ff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .qualification-text {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .qualification-answer {
+            color: #64ffda;
+            font-style: italic;
+            font-size: 0.9rem;
+            text-shadow: 0 0 5px rgba(100, 255, 218, 0.3);
+        }
+
+        .legacy-connection {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .connection-text {
+            color: #64ffda;
+            font-size: 1rem;
+            line-height: 1.7;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(100, 255, 218, 0.3);
+            font-style: italic;
+        }
+
+        .quote-section {
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.08), rgba(0, 212, 255, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .quote-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-author {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .core-principles {
+            background: rgba(5, 5, 5, 0.8);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .principles-title {
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .principle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .principle-card {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .principle-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .principle-icon {
+            color: #00d4ff;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .principle-name {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .principle-desc {
+            color: #7a8792;
+            font-size: 0.85rem;
+            font-weight: 400;
+        }
+
+        .nav-footer {
+            background: rgba(13, 17, 23, 0.95);
+            border-top: 1px solid #30363d;
+            padding: 24px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #c9d1d9;
+            text-decoration: none;
+            padding: 10px 16px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.1);
+            color: #f0f6fc;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .principle-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .qualifications-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .terminal-content {
+                padding: 20px;
+            }
+            
+            .historical-inspiration {
+                padding: 25px 20px;
+            }
+            
+            .franklin-quote-box {
+                padding: 20px 15px;
+            }
+            
+            .qualification-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-container" id="matrixContainer"></div>
+    
+    <header class="header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn">← Dashboard</a>
+            <h1 class="page-title">About JUNTO</h1>
+        </div>
+        <div class="breadcrumb">
+            <a href="dashboard.html">Dashboard</a> / About
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">JUNTO Mission</span>
+                <div class="terminal-controls">
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div class="mission-statement">
+                    <div class="mission-text">
+                        The Junto was designed to discuss morals, politics, and philosophy                    
+                    </div>
+                    <div class="mission-tagline">
+                        "A club for mutual improvement"
+                    </div>
+                </div>
+
+                <div class="objective-section">
+                    <h2 class="objective-title">🎯 Primary Objectives</h2>
+                    <div class="objective-details">
+                        <ul class="detail-list">
+                            <li>Foster intellectual and moral development through guided study and discussion</li>
+                            <li>Promote active civic participation and democratic engagement</li>
+                            <li>Protect privacy, security, and freedom of thought in the digital age</li>
+                            <li>Explore esoteric knowledge and consciousness-expanding practices</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="objective-section">
+                    <h2 class="objective-title">🚀 Future Vision</h2>
+                    <div class="objective-details">
+                        <ul class="detail-list">
+                            <li>Expand membership to likeminded individuals</li>
+                            <li>Create sustainable communities that embody our values</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="impact-metrics">
+            <h3 class="metrics-title">Current Impact Metrics</h3>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-number">∞</div>
+                    <div class="metric-label">Potential Unlocked</div>
+                    <div class="metric-description"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">3</div>
+                    <div class="metric-label">Active Members</div>
+                    <div class="metric-description"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">24/7</div>
+                    <div class="metric-label">On that grind</div>
+                    <div class="metric-description"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">∆</div>
+                    <div class="metric-label">Change Agent</div>
+                    <div class="metric-description">Locked in</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">JUNTO Core Values</span>
+                <div class="terminal-controls">
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div class="value-item">
+                    <h2 class="value-title">🧠 Moral and Intellectual Development</h2>
+                    <p class="value-description">
+                        Continuous growth in both ethical understanding and intellectual capacity. True wisdom integrates knowledge with moral judgment to guide thoughtful action.
+                    </p>
+                    <div class="value-principle">
+                        "The unexamined life is not worth living, but the examined life must be lived with purpose."
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <h2 class="value-title">🏛️ Civic Responsibility</h2>
+                    <p class="value-description">
+                        Active engagement in democratic processes and community welfare. Citizenship requires participation, not passive observation.
+                    </p>
+                    <div class="value-principle">
+                        "The price of freedom is eternal vigilance and active participation in the democratic process."
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <h2 class="value-title">🔍 Free Inquiry</h2>
+                    <p class="value-description">
+                        Unrestricted pursuit of truth through questioning assumptions and examining evidence. No topic is off-limits to honest investigation.
+                    </p>
+                    <div class="value-principle">
+                        "Question everything, accept nothing without evidence, and remain open to changing your mind."
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <h2 class="value-title">🕊️ Freedom and Tolerance</h2>
+                    <p class="value-description">
+                        Defense of individual rights to think, speak, and live freely. Protecting liberty means defending those with whom we disagree.
+                    </p>
+                    <div class="value-principle">
+                        "I may disagree with what you say, but I will defend to the death your right to say it."
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <h2 class="value-title">🔐 Privacy and Security</h2>
+                    <p class="value-description">
+                        Protection of mental and digital privacy as fundamental to human dignity. Free thought requires secure communication.
+                    </p>
+                    <div class="value-principle">
+                        "Privacy is the foundation of human dignity and the prerequisite for authentic self-development."
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <h2 class="value-title">🔮 Esoteric Knowledge and Raising Universal Consciousness</h2>
+                    <p class="value-description">
+                        Exploration of hidden wisdom and consciousness expansion to elevate both individual and collective awareness.
+                    </p>
+                    <div class="value-principle">
+                        "The mystic swims in the same waters in which the psychotic drowns - but the mystic has learned to swim."
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="historical-inspiration">
+            <h3 class="inspiration-title">Historical Inspiration: Benjamin Franklin's Junto</h3>
+            <div class="inspiration-content">
+                <div class="inspiration-intro">
+                    <p class="intro-text">
+                        Our organization draws inspiration from Benjamin Franklin's original Junto, formed in Philadelphia in 1727. Franklin created this club for "mutual improvement," bringing together ingenious minds to discuss morals, politics, and natural philosophy in pursuit of collective wisdom.
+                    </p>
+                </div>
+                
+                <div class="franklin-quote-box">
+                    <div class="franklin-quote">
+                        "The Rules I drew up requir'd that every Member in his Turn should produce one or more Queries on any Point of Morals, Politics or Natural Philosophy, to be discuss'd by the Company, and once in three Months pronounce and read an Essay of his own Writing on any Subject he pleased."
+                    </div>
+                    <div class="franklin-attribution">— Benjamin Franklin, on the original Junto</div>
+                </div>
+                
+                <div class="qualifications-section">
+                    <h4 class="qualifications-title">Franklin's Four Qualifications for Membership</h4>
+                    <div class="qualifications-grid">
+                        <div class="qualification-card">
+                            <div class="qualification-number">1</div>
+                            <div class="qualification-text">Have you any particular disrespect to any present members?</div>
+                            <div class="qualification-answer">Answer: I have not.</div>
+                        </div>
+                        <div class="qualification-card">
+                            <div class="qualification-number">2</div>
+                            <div class="qualification-text">Do you sincerely declare that you love mankind in general; of what profession or religion soever?</div>
+                            <div class="qualification-answer">Answer: I do.</div>
+                        </div>
+                        <div class="qualification-card">
+                            <div class="qualification-number">3</div>
+                            <div class="qualification-text">Do you think any person ought to be harmed in his body, name or goods, for mere speculative opinions, or his external way of worship?</div>
+                            <div class="qualification-answer">Answer: No.</div>
+                        </div>
+                        <div class="qualification-card">
+                            <div class="qualification-number">4</div>
+                            <div class="qualification-text">Do you love truth for truth's sake, and will you endeavour impartially to find and receive it yourself and communicate it to others?</div>
+                            <div class="qualification-answer">Answer: Yes.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="legacy-connection">
+                    <div class="connection-text">
+                        Franklin's Junto embodied the same principles we hold today: the pursuit of truth, civic responsibility, mutual improvement, and the betterment of society through enlightened discourse. Like our predecessors, we gather to challenge assumptions, expand knowledge, and work toward the common good.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-section">
+            <div class="quote-text glitch" data-text='"An investment in knowledge pays the best interest."'>
+                "An investment in knowledge pays the best interest."
+            </div>
+            <div class="quote-author">— Benjamin Franklin</div>
+        </div>
+
+        <div class="core-principles">
+            <h3 class="principles-title">Our Operating Principles</h3>
+            <div class="principle-grid">
+                <div class="principle-card">
+                    <div class="principle-icon">📖</div>
+                    <div class="principle-name">Lifelong Learning</div>
+                    <div class="principle-desc">Commit to continuous moral and intellectual growth</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">⚖️</div>
+                    <div class="principle-name">Ethical Action</div>
+                    <div class="principle-desc">Let wisdom guide decisions and moral courage drive action</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🌐</div>
+                    <div class="principle-name">Active Citizenship</div>
+                    <div class="principle-desc">Engage meaningfully in the democratic process</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🔍</div>
+                    <div class="principle-name">Fearless Inquiry</div>
+                    <div class="principle-desc">Question assumptions and seek truth without limits</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🛡️</div>
+                    <div class="principle-name">Defend Liberty</div>
+                    <div class="principle-desc">Protect freedom of thought and expression for all</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🌟</div>
+                    <div class="principle-name">Consciousness Expansion</div>
+                    <div class="principle-desc">Seek hidden knowledge to elevate universal awareness</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="nav-footer">
+        <a href="objectives.html" class="nav-link">Next: Objectives →</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="leadership.html" class="nav-link">← Previous: Leadership</a>
+    </footer>
+
+    <script>
+        // Check authentication
+        if (!sessionStorage.getItem('juntoAuth')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Matrix rain effect
+        const matrixContainer = document.getElementById('matrixContainer');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+        const juntoChars = 'JUNTO';
+        
+        function createMatrixColumn() {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = Math.random() * 100 + '%';
+            column.style.animationDuration = (Math.random() * 5 + 4) + 's';
+            
+            let content = '';
+            const height = Math.floor(Math.random() * 12) + 6;
+            
+            for (let i = 0; i < height; i++) {
+                const shouldHighlight = Math.random() < 0.05;
+                if (shouldHighlight) {
+                    const juntoChar = juntoChars[Math.floor(Math.random() * juntoChars.length)];
+                    content += `<span class="highlight-char">${juntoChar}</span><br>`;
+                } else {
+                    content += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                }
+            }
+            
+            column.innerHTML = content;
+            matrixContainer.appendChild(column);
+            
+            setTimeout(() => {
+                column.remove();
+            }, 9000);
+        }
+        
+        setInterval(createMatrixColumn, 200);
+        
+        // Add interactive effects
+        document.querySelectorAll('.principle-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+        
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>
