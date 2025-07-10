@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUNTO - Meeting Notes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #64ffda;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .matrix-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 12px;
+            line-height: 1.2;
+            animation: matrix-fall linear infinite;
+            opacity: 0.1;
+        }
+
+        .highlight-char {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff, 0 0 30px #00d4ff;
+            font-size: 14px;
+            opacity: 0.3;
+        }
+
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 0.15; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 3px solid #00d4ff;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(0, 212, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-shadow: 0 0 10px #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .page-title {
+            color: #00d4ff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px #00d4ff, 0 0 40px #0066cc; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 60px #0066cc, 0 0 80px #0044aa; }
+        }
+
+        .breadcrumb {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #64ffda;
+            text-decoration: none;
+            text-shadow: 0 0 5px #64ffda;
+        }
+
+        .breadcrumb a:hover {
+            color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.95);
+            border: 3px solid #00d4ff;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 212, 255, 0.03) 50%, transparent 51%);
+            pointer-events: none;
+        }
+
+        .terminal-header {
+            background: rgba(15, 15, 15, 0.95);
+            border-bottom: 2px solid #00d4ff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: inset 0 1px 0 rgba(0, 212, 255, 0.2);
+        }
+
+        .terminal-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+
+        .control-btn:nth-child(2) { background: #ffbd2e; }
+        .control-btn:nth-child(3) { background: #27ca3f; }
+
+        .terminal-content {
+            padding: 30px;
+        }
+
+        .archive-intro {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .intro-text {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .filter-section {
+            background: rgba(5, 5, 5, 0.8);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: #64ffda;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .search-box {
+            background: transparent;
+            border: 1px solid #333;
+            color: #64ffda;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-width: 200px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .meeting-entry {
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .meeting-entry:nth-child(1) { animation-delay: 0.2s; }
+        .meeting-entry:nth-child(2) { animation-delay: 0.4s; }
+        .meeting-entry:nth-child(3) { animation-delay: 0.6s; }
+        .meeting-entry:nth-child(4) { animation-delay: 0.8s; }
+        .meeting-entry:nth-child(5) { animation-delay: 1.0s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .meeting-entry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .meeting-entry:hover::before {
+            left: 100%;
+        }
+
+        .meeting-entry:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+            background: rgba(20, 20, 20, 0.9);
+        }
+
+        .meeting-header {
+            padding: 20px 25px 15px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meeting-title {
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .meeting-meta {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .meeting-date {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .meeting-classification {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .class-public {
+            background: rgba(39, 202, 63, 0.2);
+            color: #27ca3f;
+            border: 1px solid rgba(39, 202, 63, 0.3);
+        }
+
+        .class-members {
+            background: rgba(255, 189, 46, 0.2);
+            color: #ffbd2e;
+            border: 1px solid rgba(255, 189, 46, 0.3);
+        }
+
+        .class-restricted {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .meeting-preview {
+            padding: 20px 25px;
+            color: #64ffda;
+            line-height: 1.6;
+        }
+
+        .meeting-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .meeting-tag {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .meeting-actions {
+            padding: 15px 25px;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attendees {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .view-link {
+            color: #00d4ff;
+            text-decoration: none;
+            padding: 6px 12px;
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .view-link:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .stats-section {
+            background: rgba(5, 5, 5, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .stats-title {
+            color: #00d4ff;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            color: #00d4ff;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-description {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .quote-section {
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.08), rgba(0, 212, 255, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .quote-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-author {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-footer {
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid #333;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #64ffda;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.3s infinite linear alternate-reverse;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.3s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .meeting-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .meeting-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .terminal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-container" id="matrixContainer"></div>
+    
+    <header class="header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn">← Dashboard</a>
+            <h1 class="page-title">Meeting Archives</h1>
+        </div>
+        <div class="breadcrumb">
+            <a href="dashboard.html">Dashboard</a> / Meeting Notes
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">JUNTO Meeting Archive System</span>
+                <div class="terminal-controls">
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div class="archive-intro">
+                    <div class="intro-text">
+                        A comprehensive archive of JUNTO meeting records, discussions, and decisions. All sensitive information is encrypted and access is restricted based on classification level. Meeting notes serve as institutional memory and decision-making reference.
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="filter-label">Filter:</span>
+                        <button class="filter-btn active" onclick="filterMeetings('all')">All</button>
+                        <button class="filter-btn" onclick="filterMeetings('governance')">Governance</button>
+                        <button class="filter-btn" onclick="filterMeetings('research')">Research</button>
+                        <button class="filter-btn" onclick="filterMeetings('planning')">Planning</button>
+                        <button class="filter-btn" onclick="filterMeetings('emergency')">Emergency</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="filter-label">Search:</span>
+                        <input type="text" class="search-box" placeholder="Search meetings..." onInput="searchMeetings(this.value)" id="searchInput">
+                        <button class="filter-btn" onclick="clearSearch()" style="padding: 8px 12px;">Clear</button>
+                    </div>
+                </div>
+
+                <div class="meeting-entry" data-category="governance">
+                    <div class="meeting-header">
+                        <div class="meeting-title">Monthly Council Meeting - January 2025</div>
+                        <div class="meeting-meta">
+                            <div class="meeting-date">2025-01-15</div>
+                            <div class="meeting-classification class-members">MEMBERS ONLY</div>
+                        </div>
+                    </div>
+                    <div class="meeting-preview">
+                        Discussion of Q1 objectives, leadership rotation procedures, and secure communication platform deployment. Unanimous approval of new member nomination process and privacy policy updates. Addressed concerns about operational security and external partnerships.
+                        <div class="meeting-tags">
+                            <span class="meeting-tag">Governance</span>
+                            <span class="meeting-tag">Leadership</span>
+                            <span class="meeting-tag">Security</span>
+                            <span class="meeting-tag">Policy</span>
+                        </div>
+                    </div>
+                    <div class="meeting-actions">
+                        <div class="attendees">Attendees: 7 members | Duration: 2h 15m</div>
+                        <a href="#" class="view-link">📄 View Full Notes</a>
+                    </div>
+                </div>
+
+                <div class="meeting-entry" data-category="research">
+                    <div class="meeting-header">
+                        <div class="meeting-title">Consciousness Studies Workshop</div>
+                        <div class="meeting-meta">
+                            <div class="meeting-date">2025-01-08</div>
+                            <div class="meeting-classification class-members">MEMBERS ONLY</div>
+                        </div>
+                    </div>
+                    <div class="meeting-preview">
+                        Deep dive into Douglas Hofstadter's "Gödel, Escher, Bach" with focus on strange loops and self-reference. Quantum-Sage led meditation session exploring consciousness expansion techniques. Discussion of upcoming esoteric studies curriculum development.
+                        <div class="meeting-tags">
+                            <span class="meeting-tag">Consciousness</span>
+                            <span class="meeting-tag">Book Study</span>
+                            <span class="meeting-tag">Meditation</span>
+                            <span class="meeting-tag">Curriculum</span>
+                        </div>
+                    </div>
+                    <div class="meeting-actions">
+                        <div class="attendees">Attendees: 5 members | Duration: 3h 30m</div>
+                        <a href="#" class="view-link">📄 View Full Notes</a>
+                    </div>
+                </div>
+
+                <div class="meeting-entry" data-category="planning">
+                    <div class="meeting-header">
+                        <div class="meeting-title">Strategic Planning Session - Q1 2025</div>
+                        <div class="meeting-meta">
+                            <div class="meeting-date">2024-12-20</div>
+                            <div class="meeting-classification class-restricted">RESTRICTED</div>
+                        </div>
+                    </div>
+                    <div class="meeting-preview">
+                        Comprehensive review of 2025 strategic objectives and implementation timeline. Discussion of partnership opportunities with educational institutions and civil liberties organizations. Resource allocation and budget planning for secure infrastructure expansion.
+                        <div class="meeting-tags">
+                            <span class="meeting-tag">Strategy</span>
+                            <span class="meeting-tag">Planning</span>
+                            <span class="meeting-tag">Partnerships</span>
+                            <span class="meeting-tag">Budget</span>
+                        </div>
+                    </div>
+                    <div class="meeting-actions">
+                        <div class="attendees">Attendees: 4 council members | Duration: 4h 15m</div>
+                        <a href="#" class="view-link">🔒 Restricted Access</a>
+                    </div>
+                </div>
+
+                <div class="meeting-entry" data-category="emergency">
+                    <div class="meeting-header">
+                        <div class="meeting-title">Emergency Security Protocol Review</div>
+                        <div class="meeting-meta">
+                            <div class="meeting-date">2024-12-12</div>
+                            <div class="meeting-classification class-restricted">RESTRICTED</div>
+                        </div>
+                    </div>
+                    <div class="meeting-preview">
+                        Urgent review of communication security following reports of increased surveillance activities. Implementation of enhanced encryption protocols and operational security measures. Cipher-Weaver briefing on threat assessment and countermeasures.
+                        <div class="meeting-tags">
+                            <span class="meeting-tag">Emergency</span>
+                            <span class="meeting-tag">Security</span>
+                            <span class="meeting-tag">Encryption</span>
+                            <span class="meeting-tag">OPSEC</span>
+                        </div>
+                    </div>
+                    <div class="meeting-actions">
+                        <div class="attendees">Attendees: All members | Duration: 1h 45m</div>
+                        <a href="#" class="view-link">🔒 Restricted Access</a>
+                    </div>
+                </div>
+
+                <div class="meeting-entry" data-category="research">
+                    <div class="meeting-header">
+                        <div class="meeting-title">Privacy Research Symposium</div>
+                        <div class="meeting-meta">
+                            <div class="meeting-date">2024-11-28</div>
+                            <div class="meeting-classification class-public">PUBLIC SUMMARY</div>
+                        </div>
+                    </div>
+                    <div class="meeting-preview">
+                        Analysis of emerging surveillance technologies and their implications for civil liberties. Research presentations on digital privacy tools and techniques. Discussion of advocacy strategies and public education initiatives on privacy rights.
+                        <div class="meeting-tags">
+                            <span class="meeting-tag">Privacy</span>
+                            <span class="meeting-tag">Research</span>
+                            <span class="meeting-tag">Advocacy</span>
+                            <span class="meeting-tag">Technology</span>
+                        </div>
+                    </div>
+                    <div class="meeting-actions">
+                        <div class="attendees">Attendees: 6 members + 2 guests | Duration: 2h 30m</div>
+                        <a href="#" class="view-link">📄 View Summary</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h3 class="stats-title">Archive Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">47</div>
+                    <div class="stat-label">Total Meetings</div>
+                    <div class="stat-description">Since organization founding</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">156</div>
+                    <div class="stat-label">Hours Recorded</div>
+                    <div class="stat-description">Collective discussion time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">Decisions Made</div>
+                    <div class="stat-description">Consensus-based resolutions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Active Projects</div>
+                    <div class="stat-description">Ongoing initiatives tracked</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-section">
+            <div class="quote-text glitch" data-text='"The single biggest problem in communication is the illusion that it has taken place."'>
+                "The single biggest problem in communication is the illusion that it has taken place."
+            </div>
+            <div class="quote-author">— George Bernard Shaw</div>
+        </div>
+    </main>
+
+    <footer class="nav-footer">
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="dashboard.html" class="nav-link">← Complete Archive</a>
+        <a href="books.html" class="nav-link">← Previous: Books</a>
+    </footer>
+
+    <script>
+        // Check authentication
+        if (!sessionStorage.getItem('juntoAuth')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Matrix rain effect
+        const matrixContainer = document.getElementById('matrixContainer');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+        const juntoChars = 'JUNTO';
+        
+        function createMatrixColumn() {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = Math.random() * 100 + '%';
+            column.style.animationDuration = (Math.random() * 5 + 4) + 's';
+            
+            let content = '';
+            const height = Math.floor(Math.random() * 12) + 6;
+            
+            for (let i = 0; i < height; i++) {
+                const shouldHighlight = Math.random() < 0.05;
+                if (shouldHighlight) {
+                    const juntoChar = juntoChars[Math.floor(Math.random() * juntoChars.length)];
+                    content += `<span class="highlight-char">${juntoChar}</span><br>`;
+                } else {
+                    content += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                }
+            }
+            
+            column.innerHTML = content;
+            matrixContainer.appendChild(column);
+            
+            setTimeout(() => {
+                column.remove();
+            }, 9000);
+        }
+        
+        setInterval(createMatrixColumn, 200);
+        
+        // Global variables for filter state
+        let currentFilter = 'all';
+        let currentSearch = '';
+        
+        // Filter and search functionality
+        function filterMeetings(category) {
+            currentFilter = category;
+            
+            // Update button states
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Find and activate the correct button
+            const activeButton = Array.from(buttons).find(btn => 
+                btn.getAttribute('onclick').includes(`'${category}'`)
+            );
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+            
+            applyFilters();
+        }
+        
+        function searchMeetings(query) {
+            currentSearch = query;
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            const meetings = document.querySelectorAll('.meeting-entry');
+            const searchTerm = currentSearch.toLowerCase();
+            
+            meetings.forEach((meeting, index) => {
+                // Check category filter
+                const categoryMatch = currentFilter === 'all' || meeting.dataset.category === currentFilter;
+                
+                // Check search filter
+                let searchMatch = true;
+                if (searchTerm !== '') {
+                    const title = meeting.querySelector('.meeting-title').textContent.toLowerCase();
+                    const preview = meeting.querySelector('.meeting-preview').textContent.toLowerCase();
+                    const tags = Array.from(meeting.querySelectorAll('.meeting-tag'))
+                        .map(tag => tag.textContent.toLowerCase()).join(' ');
+                    const date = meeting.querySelector('.meeting-date').textContent.toLowerCase();
+                    
+                    searchMatch = title.includes(searchTerm) || 
+                                 preview.includes(searchTerm) || 
+                                 tags.includes(searchTerm) ||
+                                 date.includes(searchTerm);
+                }
+                
+                // Show or hide based on both filters
+                const shouldShow = categoryMatch && searchMatch;
+                
+                if (shouldShow) {
+                    meeting.style.display = 'block';
+                    // Stagger the fade-in animation
+                    setTimeout(() => {
+                        meeting.style.opacity = '1';
+                        meeting.style.transform = 'translateY(0)';
+                    }, index * 100);
+                } else {
+                    meeting.style.opacity = '0';
+                    meeting.style.transform = 'translateY(-20px)';
+                    setTimeout(() => {
+                        if (meeting.style.opacity === '0') {
+                            meeting.style.display = 'none';
+                        }
+                    }, 300);
+                }
+            });
+            
+            // Update results counter
+            updateResultsCounter();
+        }
+        
+        function updateResultsCounter() {
+            const visibleMeetings = document.querySelectorAll('.meeting-entry[style*="display: block"], .meeting-entry:not([style*="display: none"])');
+            const totalMeetings = document.querySelectorAll('.meeting-entry');
+            
+            // Find or create results counter
+            let counter = document.querySelector('.results-counter');
+            if (!counter) {
+                counter = document.createElement('div');
+                counter.className = 'results-counter';
+                counter.style.cssText = `
+                    color: #888;
+                    font-size: 0.9rem;
+                    margin: 15px 0;
+                    text-align: center;
+                `;
+                const filterSection = document.querySelector('.filter-section');
+                filterSection.parentNode.insertBefore(counter, filterSection.nextSibling);
+            }
+            
+            const showing = Array.from(totalMeetings).filter(meeting => 
+                meeting.style.display !== 'none' && meeting.style.opacity !== '0'
+            ).length;
+            
+            if (currentFilter !== 'all' || currentSearch !== '') {
+                counter.textContent = `Showing ${showing} of ${totalMeetings.length} meetings`;
+                counter.style.display = 'block';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+        
+        function clearSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = '';
+            currentSearch = '';
+            applyFilters();
+        }
+        
+        // Initialize filters on page load
+        function initializeFilters() {
+            // Set initial state
+            currentFilter = 'all';
+            currentSearch = '';
+            
+            // Make sure all meetings are visible initially
+            const meetings = document.querySelectorAll('.meeting-entry');
+            meetings.forEach(meeting => {
+                meeting.style.display = 'block';
+                meeting.style.opacity = '1';
+                meeting.style.transform = 'translateY(0)';
+            });
+            
+            // Set up event listeners for real-time search
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    searchMeetings(e.target.value);
+                });
+                
+                // Add keyboard shortcuts
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        clearSearch();
+                    }
+                });
+            }
+        }
+        
+        // Call initialization after DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFilters();
+        });
+        document.querySelectorAll('.meeting-entry').forEach(entry => {
+            entry.addEventListener('click', function(e) {
+                // Don't trigger if clicking on a link
+                if (e.target.tagName !== 'A') {
+                    this.style.transform = 'scale(1.01)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+        
+        // Simulate restricted access alerts
+        document.querySelectorAll('.view-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (this.textContent.includes('Restricted')) {
+                    alert('🔒 RESTRICTED ACCESS\n\nThis document requires elevated security clearance.\nContact your security administrator for access.');
+                } else {
+                    // Simulate opening meeting notes
+                    const meetingTitle = this.closest('.meeting-entry').querySelector('.meeting-title').textContent;
+                    alert(`📄 Opening: ${meetingTitle}\n\n[In a real implementation, this would open the detailed meeting notes in a secure viewer]`);
+                }
+            });
+        });
+        
+        // Add typing effect to stats numbers
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            const targets = ['47', '156', '23', '12'];
+            
+            statNumbers.forEach((stat, index) => {
+                const target = parseInt(targets[index]);
+                let current = 0;
+                const increment = target / 30;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        stat.textContent = targets[index];
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(current);
+                    }
+                }, 50);
+            });
+        }
+        
+        // Trigger stats animation when visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateStats();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+        
+        observer.observe(document.querySelector('.stats-section'));
+        
+        // Auto-filter based on URL parameters (for future enhancement)
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterParam = urlParams.get('filter');
+        if (filterParam) {
+            filterMeetings(filterParam);
+            document.querySelector(`[onclick="filterMeetings('${filterParam}')"]`).classList.add('active');
+            document.querySelector('.filter-btn.active').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
