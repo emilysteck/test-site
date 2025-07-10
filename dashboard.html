@@ -366,8 +366,7 @@
         
         <div class="nav-section">
             <div class="nav-title">Navigation</div>
-            <a href="values.html" class="nav-item">Values</a>
-            <a href="mission.html" class="nav-item">Mission</a>
+            <a href="about.html" class="nav-item">About</a>
             <a href="objectives.html" class="nav-item">Objectives</a>
             <a href="bylaws.html" class="nav-item">Bylaws</a>
             <a href="leadership.html" class="nav-item">Leadership</a>
@@ -554,8 +553,7 @@
                     'Available commands:',
                     '',
                     '<span class="info-text">Navigation Commands:</span>',
-                    '  values          - Access organizational values',
-                    '  mission         - View mission statement',
+                    '  about           - View mission, values, and organizational background',
                     '  objectives      - Review current objectives',
                     '  bylaws          - View organizational bylaws',
                     '  leadership      - See current leadership',
@@ -604,7 +602,7 @@
                     'Network Status:     <span class="success-text">ONLINE</span>',
                     'Security Level:     <span class="success-text">MAXIMUM</span>',
                     'Encryption:         <span class="success-text">AES-256</span>',
-                    'Members Online:     <span class="info-text">2</span>',
+                    'Members Online:     <span class="info-text">7</span>',
                     'Last Backup:        <span class="success-text">2 hours ago</span>',
                     'System Health:      <span class="success-text">OPTIMAL</span>'
                 ];
@@ -616,9 +614,13 @@
                     '<span class="info-text">JUNTO Member Directory</span>',
                     '─────────────────────────────────────',
                     '<span class="success-text">CODENAME        STATUS      LAST SEEN</span>',
-                    'Godel  <span class="success-text">●ONLINE</span>     Now',
-                    'Escher   <span class="success-text">●ONLINE</span>     2m ago',
-                    'Bach  <span class="warning-text">●AWAY</span>       1h ago'
+                    'Neo-Prometheus  <span class="success-text">●ONLINE</span>     Now',
+                    'Cipher-Weaver   <span class="success-text">●ONLINE</span>     2m ago',
+                    'Logic-Sphinx    <span class="warning-text">●AWAY</span>       15m ago',
+                    'Data-Mystic     <span class="success-text">●ONLINE</span>     5m ago',
+                    'Quantum-Sage    <span class="error-text">●OFFLINE</span>    2h ago',
+                    'Neural-Ghost    <span class="success-text">●ONLINE</span>     Now',
+                    'Mind-Architect  <span class="warning-text">●AWAY</span>       1h ago'
                 ];
                 return lines;
             },
@@ -680,7 +682,9 @@
             easter: () => {
                 const messages = [
                     '<span class="glitch" data-text="The cake is a lie">The cake is a lie</span>',
+                    'Douglas Hofstadter sends his regards 🔄',
                     '<span class="info-text">Strange loops detected in cognitive architecture</span>',
+                    'Gödel, Escher, Bach... and JUNTO makes four',
                     '<span class="success-text">You found the easter egg! 🥚</span>',
                     'I am a strange loop. Are you?',
                     '<span class="warning-text">Recursive function calls detected...</span>'
@@ -688,14 +692,9 @@
                 return messages[Math.floor(Math.random() * messages.length)];
             },
             
-            values: () => {
-                window.location.href = 'values.html';
-                return 'Redirecting to Values...';
-            },
-            
-            mission: () => {
-                window.location.href = 'mission.html';
-                return 'Redirecting to Mission...';
+            about: () => {
+                window.location.href = 'about.html';
+                return 'Redirecting to About...';
             },
             
             objectives: () => {
