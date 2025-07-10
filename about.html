@@ -612,6 +612,130 @@
             font-style: italic;
         }
 
+        .franklin-queries-section {
+            background: rgba(5, 5, 5, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 35px;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .franklin-queries-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #0066cc, #00d4ff);
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        .queries-title {
+            color: #00d4ff;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00d4ff;
+            letter-spacing: 1px;
+        }
+
+        .queries-intro {
+            margin-bottom: 30px;
+        }
+
+        .queries-description {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .queries-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .query-category {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .query-category:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .category-title {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00d4ff;
+            text-align: center;
+        }
+
+        .query-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .query-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .query-item:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .query-number {
+            color: #00d4ff;
+            font-weight: bold;
+            min-width: 25px;
+            text-shadow: 0 0 5px #00d4ff;
+        }
+
+        .query-text {
+            color: #64ffda;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            text-shadow: 0 0 3px rgba(100, 255, 218, 0.3);
+        }
+
+        .queries-reflection {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .reflection-text {
+            color: #64ffda;
+            font-size: 1rem;
+            line-height: 1.7;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(100, 255, 218, 0.3);
+            font-style: italic;
+        }
+
         .quote-section {
             background: linear-gradient(45deg, rgba(0, 212, 255, 0.08), rgba(0, 212, 255, 0.15));
             border: 2px solid rgba(0, 212, 255, 0.4);
@@ -799,6 +923,10 @@
                 grid-template-columns: 1fr;
             }
             
+            .queries-categories {
+                grid-template-columns: 1fr;
+            }
+            
             .metrics-grid {
                 grid-template-columns: 1fr;
             }
@@ -825,6 +953,14 @@
             }
             
             .qualification-card {
+                padding: 15px;
+            }
+            
+            .franklin-queries-section {
+                padding: 25px 20px;
+            }
+            
+            .query-category {
                 padding: 15px;
             }
         }
@@ -1031,6 +1167,113 @@
                     <div class="connection-text">
                         Franklin's Junto embodied the same principles we hold today: the pursuit of truth, civic responsibility, mutual improvement, and the betterment of society through enlightened discourse. Like our predecessors, we gather to challenge assumptions, expand knowledge, and work toward the common good.
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="franklin-queries-section">
+            <h3 class="queries-title">Franklin's Standing Queries for the Junto</h3>
+            <div class="queries-intro">
+                <p class="queries-description">
+                    These 24 questions were read and answered at every meeting of Franklin's original Junto. They guided discussions toward practical wisdom, community service, and mutual improvement. Many remain remarkably relevant to our modern pursuits.
+                </p>
+            </div>
+            
+            <div class="queries-categories">
+                <div class="query-category">
+                    <h4 class="category-title">Knowledge & Learning (1-2)</h4>
+                    <div class="query-list">
+                        <div class="query-item">
+                            <span class="query-number">1.</span>
+                            <span class="query-text">Have you met with any thing in the author you last read, remarkable, or suitable to be communicated to the Junto?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">2.</span>
+                            <span class="query-text">What new story have you lately heard agreeable for telling in conversation?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="query-category">
+                    <h4 class="category-title">Business & Economics (3-5)</h4>
+                    <div class="query-list">
+                        <div class="query-item">
+                            <span class="query-number">3.</span>
+                            <span class="query-text">Hath any citizen in your knowledge failed in his business lately, and what have you heard of the cause?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">4.</span>
+                            <span class="query-text">Have you lately heard of any citizen's thriving well, and by what means?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">5.</span>
+                            <span class="query-text">Have you lately heard how any present rich man, here or elsewhere, got his estate?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="query-category">
+                    <h4 class="category-title">Moral Conduct & Community (6-8)</h4>
+                    <div class="query-list">
+                        <div class="query-item">
+                            <span class="query-number">6.</span>
+                            <span class="query-text">Do you know of any fellow citizen, who has lately done a worthy action, deserving praise and imitation?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">7.</span>
+                            <span class="query-text">What unhappy effects of intemperance have you lately observed or heard? of imprudence? of passion?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">8.</span>
+                            <span class="query-text">What happy effects of temperance? of prudence? of moderation? or of any other virtue?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="query-category">
+                    <h4 class="category-title">Civic & Legal Matters (14-15, 23)</h4>
+                    <div class="query-list">
+                        <div class="query-item">
+                            <span class="query-number">14.</span>
+                            <span class="query-text">Have you lately observed any defect in the laws of your country, which it would be proper to move the legislature for an amendment?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">15.</span>
+                            <span class="query-text">Have you lately observed any encroachment on the just liberties of the people?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">23.</span>
+                            <span class="query-text">Is there any difficulty in matters of opinion, of justice, and injustice, which you would gladly have discussed at this time?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="query-category">
+                    <h4 class="category-title">Mutual Aid & Service (11-13, 16-22)</h4>
+                    <div class="query-list">
+                        <div class="query-item">
+                            <span class="query-number">11.</span>
+                            <span class="query-text">Do you think of any thing at present, in which the Junto may be serviceable to mankind? to their country, to their friends, or to themselves?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">12.</span>
+                            <span class="query-text">Hath any deserving stranger arrived in town since last meeting, that you heard of?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">20.</span>
+                            <span class="query-text">In what manner can the Junto, or any of them, assist you in any of your honourable designs?</span>
+                        </div>
+                        <div class="query-item">
+                            <span class="query-number">24.</span>
+                            <span class="query-text">Do you see any thing amiss in the present customs or proceedings of the Junto, which might be amended?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="queries-reflection">
+                <div class="reflection-text">
+                    These questions reveal Franklin's genius: they systematically directed attention toward learning, virtue, community service, and practical wisdom. They transformed casual conversation into purposeful discourse aimed at mutual improvement and social betterment.
                 </div>
             </div>
         </div>
