@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUNTO Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #64ffda;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        .matrix-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 12px;
+            line-height: 1.2;
+            animation: matrix-fall linear infinite;
+            opacity: 0.15;
+        }
+
+        .highlight-char {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            font-size: 14px;
+            opacity: 0.3;
+        }
+
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 0.2; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .sidebar {
+            width: 250px;
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 2px solid #00d4ff;
+            padding: 20px;
+            z-index: 2;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 2px 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .sidebar-header {
+            text-align: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo-text {
+            color: #00d4ff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .status-indicator {
+            color: #27ca3f;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .nav-section {
+            margin-bottom: 15px;
+        }
+
+        .nav-title {
+            color: #00d4ff;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: block;
+            color: #64ffda;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: #00d4ff;
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            color: #ffffff;
+        }
+
+        .utility-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .utility-item:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .session-info {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+
+        .main-terminal {
+            flex: 1;
+            background: rgba(5, 5, 5, 0.95);
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: rgba(15, 15, 15, 0.95);
+            border-bottom: 2px solid #00d4ff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-title {
+            color: #00d4ff;
+            font-size: 1.1rem;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+            cursor: pointer;
+        }
+
+        .control-btn:nth-child(2) { background: #ffbd2e; }
+        .control-btn:nth-child(3) { background: #27ca3f; }
+
+        .terminal-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .terminal-output {
+            margin-bottom: 20px;
+            min-height: 400px;
+        }
+
+        .output-line {
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .command-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .prompt {
+            color: #00d4ff;
+            margin-right: 10px;
+        }
+
+        .command-input {
+            background: transparent;
+            border: none;
+            color: #64ffda;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            outline: none;
+            flex: 1;
+            caret-color: #00d4ff;
+        }
+
+        .cursor {
+            display: inline-block;
+            background: #00d4ff;
+            width: 2px;
+            height: 1.2em;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .typing-indicator {
+            color: #888;
+            font-style: italic;
+        }
+
+        .error-text {
+            color: #ff6b6b;
+        }
+
+        .success-text {
+            color: #27ca3f;
+        }
+
+        .info-text {
+            color: #00d4ff;
+        }
+
+        .warning-text {
+            color: #ffbd2e;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.5s infinite linear alternate-reverse;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.5s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-1px, 1px); }
+            40% { transform: translate(-1px, -1px); }
+            60% { transform: translate(1px, 1px); }
+            80% { transform: translate(1px, -1px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(1px, 1px); }
+            40% { transform: translate(1px, -1px); }
+            60% { transform: translate(-1px, 1px); }
+            80% { transform: translate(-1px, -1px); }
+        }
+
+        .logout-warning {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .logout-warning.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            
+            .matrix-column {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-container" id="matrixContainer"></div>
+    
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-text">JUNTO</div>
+            <div class="status-indicator">● SECURE CONNECTION</div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Navigation</div>
+            <a href="values.html" class="nav-item">Values</a>
+            <a href="mission.html" class="nav-item">Mission</a>
+            <a href="objectives.html" class="nav-item">Objectives</a>
+            <a href="books.html" class="nav-item">Books</a>
+            <a href="meeting-notes.html" class="nav-item">Meeting Notes</a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Utilities</div>
+            <div class="utility-item" onclick="systemStatus()">
+                <span>System Status</span>
+                <span style="color: #27ca3f;">●</span>
+            </div>
+            <div class="utility-item" onclick="memberDirectory()">
+                <span>Member Directory</span>
+                <span>»</span>
+            </div>
+            <div class="utility-item" onclick="cipherTools()">
+                <span>Cipher Tools</span>
+                <span>⧨</span>
+            </div>
+            <div class="utility-item" onclick="archiveSearch()">
+                <span>Archive Search</span>
+                <span>🔍</span>
+            </div>
+            <div class="utility-item" onclick="secureComms()">
+                <span>Secure Comms</span>
+                <span>📡</span>
+            </div>
+        </div>
+        
+        <div class="session-info">
+            <div>Session: <span id="sessionTime">--:--:--</span></div>
+            <div>Security Level: <span style="color: #00d4ff;">ENCRYPTED</span></div>
+            <div>Last Login: <span id="lastLogin">Loading...</span></div>
+        </div>
+    </nav>
+    
+    <main class="main-terminal">
+        <div class="terminal-header">
+            <span class="terminal-title">JUNTO Command Interface</span>
+            <div class="terminal-controls">
+                <div class="control-btn" onclick="minimizeTerminal()"></div>
+                <div class="control-btn" onclick="maximizeTerminal()"></div>
+                <div class="control-btn" onclick="closeTerminal()"></div>
+            </div>
+        </div>
+        
+        <div class="terminal-content">
+            <div class="terminal-output" id="terminalOutput">
+                <div class="output-line">Welcome to JUNTO Command Interface v2.1</div>
+                <div class="output-line">Initializing secure environment...</div>
+                <div class="output-line success-text">✓ Connection established</div>
+                <div class="output-line success-text">✓ Authentication verified</div>
+                <div class="output-line success-text">✓ Security protocols active</div>
+                <div class="output-line">Ready for commands. Type 'help' for available options.</div>
+                <div class="output-line">─────────────────────────────────────────────────</div>
+            </div>
+            
+            <div class="command-line">
+                <span class="prompt">junto@secure:~$</span>
+                <input type="text" class="command-input" id="commandInput" placeholder="Enter command..." autocomplete="off">
+                <span class="cursor"></span>
+            </div>
+        </div>
+    </main>
+    
+    <div class="logout-warning" id="logoutWarning">
+        Session expires in <span id="countdown">5:00</span>
+    </div>
+
+    <script>
+        // Check authentication
+        if (!sessionStorage.getItem('juntoAuth')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Matrix rain effect (lighter for dashboard)
+        const matrixContainer = document.getElementById('matrixContainer');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+        const juntoChars = 'JUNTO';
+        
+        function createMatrixColumn() {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = Math.random() * 100 + '%';
+            column.style.animationDuration = (Math.random() * 4 + 3) + 's';
+            
+            let content = '';
+            const height = Math.floor(Math.random() * 15) + 8;
+            
+            for (let i = 0; i < height; i++) {
+                const shouldHighlight = Math.random() < 0.08;
+                if (shouldHighlight) {
+                    const juntoChar = juntoChars[Math.floor(Math.random() * juntoChars.length)];
+                    content += `<span class="highlight-char">${juntoChar}</span><br>`;
+                } else {
+                    content += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                }
+            }
+            
+            column.innerHTML = content;
+            matrixContainer.appendChild(column);
+            
+            setTimeout(() => {
+                column.remove();
+            }, 7000);
+        }
+        
+        setInterval(createMatrixColumn, 150);
+        
+        // Session management
+        const loginTime = new Date(sessionStorage.getItem('loginTime'));
+        const sessionDuration = 24 * 60 * 60 * 1000; // 24 hours
+        let warningShown = false;
+        
+        function updateSessionInfo() {
+            const now = new Date();
+            const elapsed = now - loginTime;
+            const remaining = sessionDuration - elapsed;
+            
+            // Update session time
+            const hours = Math.floor(elapsed / (1000 * 60 * 60));
+            const minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+            document.getElementById('sessionTime').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update last login
+            document.getElementById('lastLogin').textContent = loginTime.toLocaleString();
+            
+            // Show warning if less than 5 minutes remaining
+            if (remaining < 5 * 60 * 1000 && remaining > 0 && !warningShown) {
+                showLogoutWarning(remaining);
+                warningShown = true;
+            }
+            
+            // Auto logout
+            if (remaining <= 0) {
+                logout();
+            }
+        }
+        
+        function showLogoutWarning(remaining) {
+            const warning = document.getElementById('logoutWarning');
+            const countdown = document.getElementById('countdown');
+            
+            const updateCountdown = () => {
+                const now = new Date();
+                const timeLeft = sessionDuration - (now - loginTime);
+                if (timeLeft <= 0) {
+                    logout();
+                    return;
+                }
+                
+                const minutes = Math.floor(timeLeft / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                countdown.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            };
+            
+            warning.classList.add('show');
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('juntoAuth');
+            sessionStorage.removeItem('loginTime');
+            window.location.href = 'index.html';
+        }
+        
+        setInterval(updateSessionInfo, 1000);
+        updateSessionInfo();
+        
+        // Terminal command system
+        const terminalOutput = document.getElementById('terminalOutput');
+        const commandInput = document.getElementById('commandInput');
+        let commandHistory = [];
+        let historyIndex = -1;
+        
+        const commands = {
+            help: () => {
+                return `Available commands:
+                
+<span class="info-text">Navigation Commands:</span>
+  values          - Access organizational values
+  mission         - View mission statement
+  objectives      - Review current objectives
+  books           - Browse reading list
+  notes           - Access meeting notes
+  
+<span class="info-text">System Commands:</span>
+  status          - Show system status
+  members         - List member directory
+  cipher          - Access cipher tools
+  search          - Search archives
+  comms           - Secure communications
+  
+<span class="info-text">Utility Commands:</span>
+  clear           - Clear terminal output
+  time            - Show current time
+  whoami          - Display user info
+  logout          - End session
+  easter          - ???`;
+            },
+            
+            clear: () => {
+                terminalOutput.innerHTML = '';
+                return '';
+            },
+            
+            time: () => {
+                return `Current time: ${new Date().toLocaleString()}`;
+            },
+            
+            whoami: () => {
+                return `<span class="success-text">Authenticated JUNTO member</span>
+Security clearance: <span class="info-text">FULL ACCESS</span>
+Session started: ${loginTime.toLocaleString()}`;
+            },
+            
+            status: () => {
+                return `<span class="info-text">JUNTO System Status Report</span>
+─────────────────────────────────────
+Network Status:     <span class="success-text">ONLINE</span>
+Security Level:     <span class="success-text">MAXIMUM</span>
+Encryption:         <span class="success-text">AES-256</span>
+Members Online:     <span class="info-text">7</span>
+Last Backup:        <span class="success-text">2 hours ago</span>
+System Health:      <span class="success-text">OPTIMAL</span>`;
+            },
+            
+            members: () => {
+                return `<span class="info-text">JUNTO Member Directory</span>
+─────────────────────────────────────
+<span class="success-text">CODENAME        STATUS      LAST SEEN</span>
+Neo-Prometheus  <span class="success-text">●ONLINE</span>     Now
+Cipher-Weaver   <span class="success-text">●ONLINE</span>     2m ago
+Logic-Sphinx    <span class="warning-text">●AWAY</span>       15m ago
+Data-Mystic     <span class="success-text">●ONLINE</span>     5m ago
+Quantum-Sage    <span class="error-text">●OFFLINE</span>    2h ago
+Neural-Ghost    <span class="success-text">●ONLINE</span>     Now
+Mind-Architect  <span class="warning-text">●AWAY</span>       1h ago`;
+            },
+            
+            cipher: () => {
+                return `<span class="info-text">JUNTO Cipher Tools v3.1</span>
+─────────────────────────────────────
+Available encryption methods:
+• ROT13 Caesar cipher
+• Base64 encoding/decoding  
+• Morse code translation
+• Binary conversion
+• Hexadecimal encoding
+• Custom substitution cipher
+
+Usage: cipher [method] [text]
+Example: cipher rot13 "hello world"`;
+            },
+            
+            search: () => {
+                return `<span class="info-text">Archive Search Interface</span>
+─────────────────────────────────────
+Searching JUNTO knowledge base...
+<span class="success-text">Index last updated: Today 14:32</span>
+
+Recent additions:
+• Meeting notes - Project Omega discussion
+• Book analysis - "The Ego and Its Own"
+• Research paper - Collective intelligence models
+• Encrypted memo - [CLASSIFIED]
+
+Use: search [keyword] to query archives`;
+            },
+            
+            comms: () => {
+                return `<span class="info-text">Secure Communications Hub</span>
+─────────────────────────────────────
+<span class="success-text">Encrypted channels active</span>
+
+Active discussions:
+• #general-discourse (7 members)
+• #project-omega (3 members) 
+• #reading-circle (5 members)
+• #encrypted-vault (2 members)
+
+Send message: comms [channel] [message]
+Private message: comms @[codename] [message]`;
+            },
+            
+            easter: () => {
+                const messages = [
+                    '<span class="glitch" data-text="The cake is a lie">The cake is a lie</span>',
+                    'Douglas Hofstadter sends his regards 🔄',
+                    '<span class="info-text">Strange loops detected in cognitive architecture</span>',
+                    'Gödel, Escher, Bach... and JUNTO makes four',
+                    '<span class="success-text">You found the easter egg! 🥚</span>',
+                    'I am a strange loop. Are you?',
+                    '<span class="warning-text">Recursive function calls detected...</span>'
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            },
+            
+            values: () => {
+                window.location.href = 'values.html';
+                return 'Redirecting to Values...';
+            },
+            
+            mission: () => {
+                window.location.href = 'mission.html';
+                return 'Redirecting to Mission...';
+            },
+            
+            objectives: () => {
+                window.location.href = 'objectives.html';
+                return 'Redirecting to Objectives...';
+            },
+            
+            books: () => {
+                window.location.href = 'books.html';
+                return 'Redirecting to Books...';
+            },
+            
+            notes: () => {
+                window.location.href = 'meeting-notes.html';
+                return 'Redirecting to Meeting Notes...';
+            },
+            
+            logout: () => {
+                logout();
+                return 'Logging out...';
+            }
+        };
+        
+        function addOutput(text, delay = 0) {
+            setTimeout(() => {
+                const line = document.createElement('div');
+                line.className = 'output-line';
+                line.innerHTML = text;
+                terminalOutput.appendChild(line);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }, delay);
+        }
+        
+        function processCommand(cmd) {
+            const command = cmd.trim().toLowerCase();
+            addOutput(`<span class="prompt">junto@secure:~$</span> ${cmd}`);
+            
+            if (commands[command]) {
+                const result = commands[command]();
+                if (result) {
+                    addOutput(result, 100);
+                }
+            } else if (command === '') {
+                // Do nothing for empty command
+            } else {
+                addOutput(`<span class="error-text">Command not found: ${command}</span>
+Type 'help' for available commands.`, 100);
+            }
+            
+            commandHistory.unshift(cmd);
+            if (commandHistory.length > 50) commandHistory.pop();
+            historyIndex = -1;
+        }
+        
+        commandInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = commandInput.value;
+                commandInput.value = '';
+                processCommand(command);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    commandInput.value = commandHistory[historyIndex] || '';
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    commandInput.value = commandHistory[historyIndex] || '';
+                } else {
+                    historyIndex = -1;
+                    commandInput.value = '';
+                }
+            }
+        });
+        
+        // Sidebar utility functions
+        function systemStatus() {
+            processCommand('status');
+            commandInput.focus();
+        }
+        
+        function memberDirectory() {
+            processCommand('members');
+            commandInput.focus();
+        }
+        
+        function cipherTools() {
+            processCommand('cipher');
+            commandInput.focus();
+        }
+        
+        function archiveSearch() {
+            processCommand('search');
+            commandInput.focus();
+        }
+        
+        function secureComms() {
+            processCommand('comms');
+            commandInput.focus();
+        }
+        
+        // Terminal control functions
+        function minimizeTerminal() {
+            addOutput('<span class="warning-text">Terminal minimize not available in secure mode</span>');
+        }
+        
+        function maximizeTerminal() {
+            addOutput('<span class="info-text">Terminal already maximized for optimal security</span>');
+        }
+        
+        function closeTerminal() {
+            if (confirm('Are you sure you want to close the terminal? This will log you out.')) {
+                logout();
+            }
+        }
+        
+        // Auto-focus command input
+        commandInput.focus();
+        
+        // Initialize with welcome animation
+        setTimeout(() => {
+            const lines = terminalOutput.querySelectorAll('.output-line');
+            lines.forEach((line, index) => {
+                line.style.animationDelay = `${index * 0.3}s`;
+            });
+        }, 100);
+    </script>
+</body>
+</html>
