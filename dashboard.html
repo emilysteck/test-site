@@ -380,8 +380,8 @@
                 <span>»</span>
             </div>
             <div class="utility-item" onclick="cipherTools()">
-                <span>Cipher Tools</span>
-                <span>⧨</span>
+                <span>Encryption Tools</span>
+                <span>🔐</span>
             </div>
             <div class="utility-item" onclick="archiveSearch()">
                 <span>Archive Search</span>
@@ -544,28 +544,31 @@
         
         const commands = {
             help: () => {
-                return `Available commands:
-                
-<span class="info-text">Navigation Commands:</span>
-  values          - Access organizational values
-  mission         - View mission statement
-  objectives      - Review current objectives
-  books           - Browse reading list
-  notes           - Access meeting notes
-  
-<span class="info-text">System Commands:</span>
-  status          - Show system status
-  members         - List member directory
-  cipher          - Access cipher tools
-  search          - Search archives
-  comms           - Secure communications
-  
-<span class="info-text">Utility Commands:</span>
-  clear           - Clear terminal output
-  time            - Show current time
-  whoami          - Display user info
-  logout          - End session
-  easter          - ???`;
+                const lines = [
+                    'Available commands:',
+                    '',
+                    '<span class="info-text">Navigation Commands:</span>',
+                    '  values          - Access organizational values',
+                    '  mission         - View mission statement',
+                    '  objectives      - Review current objectives',
+                    '  books           - Browse reading list',
+                    '  notes           - Access meeting notes',
+                    '',
+                    '<span class="info-text">System Commands:</span>',
+                    '  status          - Show system status',
+                    '  members         - List member directory',
+                    '  cipher          - Access encryption/decryption tools',
+                    '  search          - Search archives',
+                    '  comms           - Secure communications',
+                    '',
+                    '<span class="info-text">Utility Commands:</span>',
+                    '  clear           - Clear terminal output',
+                    '  time            - Show current time',
+                    '  whoami          - Display user info',
+                    '  logout          - End session',
+                    '  easter          - ???'
+                ];
+                return lines;
             },
             
             clear: () => {
@@ -578,78 +581,96 @@
             },
             
             whoami: () => {
-                return `<span class="success-text">Authenticated JUNTO member</span>
-Security clearance: <span class="info-text">FULL ACCESS</span>
-Session started: ${loginTime.toLocaleString()}`;
+                const lines = [
+                    '<span class="success-text">Authenticated JUNTO member</span>',
+                    'Security clearance: <span class="info-text">FULL ACCESS</span>',
+                    'Session started: ' + loginTime.toLocaleString()
+                ];
+                return lines;
             },
             
             status: () => {
-                return `<span class="info-text">JUNTO System Status Report</span>
-─────────────────────────────────────
-Network Status:     <span class="success-text">ONLINE</span>
-Security Level:     <span class="success-text">MAXIMUM</span>
-Encryption:         <span class="success-text">AES-256</span>
-Members Online:     <span class="info-text">7</span>
-Last Backup:        <span class="success-text">2 hours ago</span>
-System Health:      <span class="success-text">OPTIMAL</span>`;
+                const lines = [
+                    '<span class="info-text">JUNTO System Status Report</span>',
+                    '─────────────────────────────────────',
+                    'Network Status:     <span class="success-text">ONLINE</span>',
+                    'Security Level:     <span class="success-text">MAXIMUM</span>',
+                    'Encryption:         <span class="success-text">AES-256</span>',
+                    'Members Online:     <span class="info-text">7</span>',
+                    'Last Backup:        <span class="success-text">2 hours ago</span>',
+                    'System Health:      <span class="success-text">OPTIMAL</span>'
+                ];
+                return lines;
             },
             
             members: () => {
-                return `<span class="info-text">JUNTO Member Directory</span>
-─────────────────────────────────────
-<span class="success-text">CODENAME        STATUS      LAST SEEN</span>
-Neo-Prometheus  <span class="success-text">●ONLINE</span>     Now
-Cipher-Weaver   <span class="success-text">●ONLINE</span>     2m ago
-Logic-Sphinx    <span class="warning-text">●AWAY</span>       15m ago
-Data-Mystic     <span class="success-text">●ONLINE</span>     5m ago
-Quantum-Sage    <span class="error-text">●OFFLINE</span>    2h ago
-Neural-Ghost    <span class="success-text">●ONLINE</span>     Now
-Mind-Architect  <span class="warning-text">●AWAY</span>       1h ago`;
+                const lines = [
+                    '<span class="info-text">JUNTO Member Directory</span>',
+                    '─────────────────────────────────────',
+                    '<span class="success-text">CODENAME        STATUS      LAST SEEN</span>',
+                    'Neo-Prometheus  <span class="success-text">●ONLINE</span>     Now',
+                    'Cipher-Weaver   <span class="success-text">●ONLINE</span>     2m ago',
+                    'Logic-Sphinx    <span class="warning-text">●AWAY</span>       15m ago',
+                    'Data-Mystic     <span class="success-text">●ONLINE</span>     5m ago',
+                    'Quantum-Sage    <span class="error-text">●OFFLINE</span>    2h ago',
+                    'Neural-Ghost    <span class="success-text">●ONLINE</span>     Now',
+                    'Mind-Architect  <span class="warning-text">●AWAY</span>       1h ago'
+                ];
+                return lines;
             },
             
             cipher: () => {
-                return `<span class="info-text">JUNTO Cipher Tools v3.1</span>
-─────────────────────────────────────
-Available encryption methods:
-• ROT13 Caesar cipher
-• Base64 encoding/decoding  
-• Morse code translation
-• Binary conversion
-• Hexadecimal encoding
-• Custom substitution cipher
-
-Usage: cipher [method] [text]
-Example: cipher rot13 "hello world"`;
+                const lines = [
+                    '<span class="info-text">JUNTO Encryption & Decryption Tools v3.1</span>',
+                    '─────────────────────────────────────',
+                    'Available encryption methods:',
+                    '• ROT13 Caesar cipher',
+                    '• Base64 encoding/decoding',
+                    '• Morse code translation',
+                    '• Binary conversion',
+                    '• Hexadecimal encoding',
+                    '• Custom substitution cipher',
+                    '',
+                    'Usage: cipher [method] [text]',
+                    'Example: cipher rot13 "hello world"'
+                ];
+                return lines;
             },
             
             search: () => {
-                return `<span class="info-text">Archive Search Interface</span>
-─────────────────────────────────────
-Searching JUNTO knowledge base...
-<span class="success-text">Index last updated: Today 14:32</span>
-
-Recent additions:
-• Meeting notes - Project Omega discussion
-• Book analysis - "The Ego and Its Own"
-• Research paper - Collective intelligence models
-• Encrypted memo - [CLASSIFIED]
-
-Use: search [keyword] to query archives`;
+                const lines = [
+                    '<span class="info-text">Archive Search Interface</span>',
+                    '─────────────────────────────────────',
+                    'Searching JUNTO knowledge base...',
+                    '<span class="success-text">Index last updated: Today 14:32</span>',
+                    '',
+                    'Recent additions:',
+                    '• Meeting notes - Project Omega discussion',
+                    '• Book analysis - "The Ego and Its Own"',
+                    '• Research paper - Collective intelligence models',
+                    '• Encrypted memo - [CLASSIFIED]',
+                    '',
+                    'Use: search [keyword] to query archives'
+                ];
+                return lines;
             },
             
             comms: () => {
-                return `<span class="info-text">Secure Communications Hub</span>
-─────────────────────────────────────
-<span class="success-text">Encrypted channels active</span>
-
-Active discussions:
-• #general-discourse (7 members)
-• #project-omega (3 members) 
-• #reading-circle (5 members)
-• #encrypted-vault (2 members)
-
-Send message: comms [channel] [message]
-Private message: comms @[codename] [message]`;
+                const lines = [
+                    '<span class="info-text">Secure Communications Hub</span>',
+                    '─────────────────────────────────────',
+                    '<span class="success-text">Encrypted channels active</span>',
+                    '',
+                    'Active discussions:',
+                    '• #general-discourse (7 members)',
+                    '• #project-omega (3 members)',
+                    '• #reading-circle (5 members)',
+                    '• #encrypted-vault (2 members)',
+                    '',
+                    'Send message: comms [channel] [message]',
+                    'Private message: comms @[codename] [message]'
+                ];
+                return lines;
             },
             
             easter: () => {
@@ -698,10 +719,22 @@ Private message: comms @[codename] [message]`;
         
         function addOutput(text, delay = 0) {
             setTimeout(() => {
-                const line = document.createElement('div');
-                line.className = 'output-line';
-                line.innerHTML = text;
-                terminalOutput.appendChild(line);
+                if (Array.isArray(text)) {
+                    // Handle array of lines
+                    text.forEach((line, index) => {
+                        const lineElement = document.createElement('div');
+                        lineElement.className = 'output-line';
+                        lineElement.innerHTML = line;
+                        lineElement.style.animationDelay = `${index * 0.05}s`;
+                        terminalOutput.appendChild(lineElement);
+                    });
+                } else {
+                    // Handle single line
+                    const line = document.createElement('div');
+                    line.className = 'output-line';
+                    line.innerHTML = text;
+                    terminalOutput.appendChild(line);
+                }
                 terminalOutput.scrollTop = terminalOutput.scrollHeight;
             }, delay);
         }
