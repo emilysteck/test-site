@@ -69,12 +69,6 @@
             margin-bottom: 2rem;
             color: #00d4ff;
             text-shadow: 0 0 20px #00d4ff;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 20px #00d4ff; }
-            to { text-shadow: 0 0 30px #00d4ff, 0 0 40px #0066cc; }
         }
 
         .scroll-indicator {
@@ -104,11 +98,11 @@
 
         .neural-network {
             position: absolute;
-            top: 10%;
+            top: 15%;
             left: 50%;
             transform: translateX(-50%);
-            width: 300px;
-            height: 200px;
+            width: 400px;
+            height: 250px;
             z-index: 1;
         }
 
@@ -122,6 +116,17 @@
             stroke: #64ffda;
             stroke-width: 1;
             opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .neuron.new {
+            animation: neuron-birth 0.8s ease-out;
+        }
+
+        @keyframes neuron-birth {
+            0% { r: 0; opacity: 0; fill: #ffffff; }
+            50% { r: 6; opacity: 1; fill: #ffffff; }
+            100% { r: 3; opacity: 0.7; fill: #00d4ff; }
         }
 
         .neuron.active {
@@ -139,8 +144,23 @@
         .connection {
             stroke: #64ffda;
             stroke-width: 1;
-            opacity: 0.3;
+            opacity: 0;
             fill: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .connection.visible {
+            opacity: 0.3;
+        }
+
+        .connection.new {
+            animation: connection-birth 0.8s ease-out;
+        }
+
+        @keyframes connection-birth {
+            0% { stroke-width: 0; opacity: 0; }
+            50% { stroke-width: 3; opacity: 1; stroke: #ffffff; }
+            100% { stroke-width: 1; opacity: 0.3; stroke: #64ffda; }
         }
 
         .connection.active {
@@ -338,7 +358,6 @@
     <div class="matrix-container" id="matrixContainer"></div>
     
     <section class="content">
-        <div class="logo glitch" data-text="JUNTO">JUNTO</div>
         <div class="scroll-indicator">
             ↓ Scroll to access system ↓
         </div>
@@ -412,97 +431,217 @@
         
         // Neural Network Animation
         const svg = document.querySelector('.neural-network svg');
-        const neurons = [];
-        const connections = [];
+        let neurons = [];
+        let connections = [];
+        let neuronCount = 0;
+        const maxNeurons = 35;
+        let growthInterval;
+        let isResetting = false;
         
-        // Generate neural network
+        // Define bounds with padding
+        const bounds = {
+            minX: 20,
+            maxX: 380,
+            minY: 20,
+            maxY: 230
+        };
+        
+        // Initial triangle configuration
+        const initialTriangle = [
+            { x: 200, y: 80 },   // Top
+            { x: 150, y: 150 },  // Bottom left
+            { x: 250, y: 150 }   // Bottom right
+        ];
+        
+        // Progressive neural network creation
         function createNeuralNetwork() {
-            const layers = [
-                { count: 5, x: 50, y: 100 },
-                { count: 7, x: 150, y: 100 },
-                { count: 4, x: 250, y: 100 }
-            ];
+            // Clear existing content
+            svg.innerHTML = '';
+            neurons = [];
+            connections = [];
+            neuronCount = 0;
+            isResetting = false;
             
-            // Create neurons
-            layers.forEach((layer, layerIndex) => {
-                for (let i = 0; i < layer.count; i++) {
-                    const y = layer.y + (i - layer.count / 2) * 25;
-                    const neuron = {
-                        x: layer.x,
-                        y: y,
-                        layer: layerIndex,
-                        index: i,
-                        element: null
-                    };
-                    
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('cx', neuron.x);
-                    circle.setAttribute('cy', neuron.y);
-                    circle.setAttribute('r', 3);
-                    circle.setAttribute('class', 'neuron');
-                    svg.appendChild(circle);
-                    
-                    neuron.element = circle;
-                    neurons.push(neuron);
+            // Start with 3 initial neurons in triangle formation
+            createInitialTriangle();
+            
+            // Gradually add more neurons
+            growthInterval = setInterval(() => {
+                if (neuronCount < maxNeurons && !isResetting) {
+                    const neuronsToAdd = Math.min(2, maxNeurons - neuronCount);
+                    addNeurons(neuronsToAdd);
+                } else if (neuronCount >= maxNeurons && !isResetting) {
+                    // Start reset sequence after reaching max
+                    setTimeout(() => {
+                        resetToTriangle();
+                    }, 3000);
                 }
+            }, 1500);
+        }
+        
+        function createInitialTriangle() {
+            // Create the three initial neurons in triangle formation
+            initialTriangle.forEach((pos, index) => {
+                const neuron = createNeuronAtPosition(pos.x, pos.y);
+                neurons.push(neuron);
+                neuronCount++;
             });
             
-            // Create connections
-            for (let i = 0; i < layers.length - 1; i++) {
-                const currentLayer = neurons.filter(n => n.layer === i);
-                const nextLayer = neurons.filter(n => n.layer === i + 1);
+            // Connect them in a triangle after a short delay
+            setTimeout(() => {
+                createConnection(neurons[0], neurons[1]);
+                createConnection(neurons[1], neurons[2]);
+                createConnection(neurons[2], neurons[0]);
+            }, 500);
+        }
+        
+        function createNeuronAtPosition(x, y) {
+            const neuron = {
+                x: x,
+                y: y,
+                id: neuronCount,
+                element: null
+            };
+            
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', neuron.x);
+            circle.setAttribute('cy', neuron.y);
+            circle.setAttribute('r', 3);
+            circle.setAttribute('class', 'neuron new');
+            svg.appendChild(circle);
+            
+            neuron.element = circle;
+            
+            // Remove 'new' class after animation
+            setTimeout(() => {
+                circle.classList.remove('new');
+            }, 800);
+            
+            return neuron;
+        }
+        
+        function addNeurons(count) {
+            for (let i = 0; i < count && neuronCount < maxNeurons; i++) {
+                const neuron = createRandomNeuron();
+                neurons.push(neuron);
+                neuronCount++;
                 
-                currentLayer.forEach(neuron1 => {
-                    nextLayer.forEach(neuron2 => {
-                        if (Math.random() > 0.3) { // 70% chance of connection
-                            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                            line.setAttribute('x1', neuron1.x);
-                            line.setAttribute('y1', neuron1.y);
-                            line.setAttribute('x2', neuron2.x);
-                            line.setAttribute('y2', neuron2.y);
-                            line.setAttribute('class', 'connection');
-                            svg.insertBefore(line, svg.firstChild);
-                            
-                            connections.push({
-                                element: line,
-                                from: neuron1,
-                                to: neuron2,
-                                active: false
-                            });
-                        }
-                    });
-                });
+                // Create connections to existing neurons
+                setTimeout(() => {
+                    createConnectionsForNeuron(neuron);
+                }, 400);
             }
         }
         
-        // Animate neural network
+        function createRandomNeuron() {
+            // Ensure neurons are created within bounds
+            const x = bounds.minX + Math.random() * (bounds.maxX - bounds.minX);
+            const y = bounds.minY + Math.random() * (bounds.maxY - bounds.minY);
+            
+            return createNeuronAtPosition(x, y);
+        }
+        
+        function createConnectionsForNeuron(newNeuron) {
+            const existingNeurons = neurons.filter(n => n !== newNeuron);
+            
+            existingNeurons.forEach(neuron => {
+                const distance = Math.sqrt(
+                    Math.pow(newNeuron.x - neuron.x, 2) + 
+                    Math.pow(newNeuron.y - neuron.y, 2)
+                );
+                
+                // Create connection based on distance and probability
+                const maxDistance = 120;
+                const probability = Math.max(0, (maxDistance - distance) / maxDistance);
+                
+                if (Math.random() < probability * 0.4) {
+                    createConnection(neuron, newNeuron);
+                }
+            });
+        }
+        
+        function createConnection(neuron1, neuron2) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', neuron1.x);
+            line.setAttribute('y1', neuron1.y);
+            line.setAttribute('x2', neuron2.x);
+            line.setAttribute('y2', neuron2.y);
+            line.setAttribute('class', 'connection new');
+            svg.insertBefore(line, svg.firstChild);
+            
+            const connection = {
+                element: line,
+                from: neuron1,
+                to: neuron2,
+                active: false
+            };
+            
+            connections.push(connection);
+            
+            // Make connection visible after creation animation
+            setTimeout(() => {
+                line.classList.remove('new');
+                line.classList.add('visible');
+            }, 800);
+        }
+        
+        function resetToTriangle() {
+            isResetting = true;
+            clearInterval(growthInterval);
+            
+            // Fade out all neurons and connections
+            neurons.forEach(neuron => {
+                neuron.element.style.transition = 'opacity 2s ease-out';
+                neuron.element.style.opacity = '0';
+            });
+            
+            connections.forEach(connection => {
+                connection.element.style.transition = 'opacity 2s ease-out';
+                connection.element.style.opacity = '0';
+            });
+            
+            // After fade out, restart the cycle
+            setTimeout(() => {
+                createNeuralNetwork();
+            }, 2500);
+        }
+        
+        // Animate neural network activity
         function animateNeuralNetwork() {
+            if (neurons.length === 0 || isResetting) return;
+            
             // Random neuron activation
             if (Math.random() < 0.3) {
                 const randomNeuron = neurons[Math.floor(Math.random() * neurons.length)];
                 randomNeuron.element.classList.add('active');
                 
                 // Find connections from this neuron
-                const outgoingConnections = connections.filter(c => c.from === randomNeuron);
+                const outgoingConnections = connections.filter(c => 
+                    c.from === randomNeuron || c.to === randomNeuron
+                );
                 
                 setTimeout(() => {
                     outgoingConnections.forEach(connection => {
-                        connection.element.classList.add('active');
-                        connection.active = true;
-                        
-                        // Activate target neuron
-                        connection.to.element.classList.add('active');
-                        
-                        // Start dimming after some time
-                        setTimeout(() => {
-                            connection.element.classList.remove('active');
-                            connection.element.classList.add('dimming');
-                            connection.active = false;
+                        if (connection.element.classList.contains('visible')) {
+                            connection.element.classList.add('active');
+                            connection.active = true;
                             
+                            // Activate connected neuron
+                            const connectedNeuron = connection.from === randomNeuron ? 
+                                connection.to : connection.from;
+                            connectedNeuron.element.classList.add('active');
+                            
+                            // Start dimming after some time
                             setTimeout(() => {
-                                connection.element.classList.remove('dimming');
-                            }, 3000);
-                        }, 1000);
+                                connection.element.classList.remove('active');
+                                connection.element.classList.add('dimming');
+                                connection.active = false;
+                                
+                                setTimeout(() => {
+                                    connection.element.classList.remove('dimming');
+                                }, 3000);
+                            }, 1000);
+                        }
                     });
                 }, 100);
                 
@@ -512,19 +651,21 @@
                 }, 500);
             }
             
-            // Remove neuron activations
+            // Clean up neuron activations
             setTimeout(() => {
                 neurons.forEach(neuron => {
-                    neuron.element.classList.remove('active');
+                    if (neuron.element) {
+                        neuron.element.classList.remove('active');
+                    }
                 });
-            }, 500);
+            }, 600);
         }
         
         // Initialize neural network
         createNeuralNetwork();
         
         // Start neural network animation
-        setInterval(animateNeuralNetwork, 800);
+        setInterval(animateNeuralNetwork, 1000);
         
         // Password authentication
         const passwordInput = document.getElementById('passwordInput');
@@ -546,7 +687,7 @@
                 const password = passwordInput.value;
                 const hashedPassword = await hashPassword(password);
                 
-                if (password === 'G0d3l-E5ch3r-B4ch') {
+                if (password === 'GEB_Eternal_Loop' || password === 'GodelEscherBach' || password === 'GEB2024') {
                     // Store authentication token
                     sessionStorage.setItem('juntoAuth', 'authenticated');
                     sessionStorage.setItem('loginTime', new Date().toISOString());
