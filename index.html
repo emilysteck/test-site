@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUNTO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #64ffda;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .matrix-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 14px;
+            line-height: 1.2;
+            animation: matrix-fall linear infinite;
+            opacity: 0.25;
+        }
+
+        .highlight-char {
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00d4ff;
+            font-size: 18px;
+            opacity: 0.4;
+        }
+
+        @keyframes matrix-fall {
+            0% { top: -100%; opacity: 0.3; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #00d4ff;
+            text-shadow: 0 0 20px #00d4ff;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00d4ff; }
+            to { text-shadow: 0 0 30px #00d4ff, 0 0 40px #0066cc; }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #64ffda;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .auth-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .neural-network {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 200px;
+            z-index: 1;
+        }
+
+        .neural-network svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .neuron {
+            fill: #00d4ff;
+            stroke: #64ffda;
+            stroke-width: 1;
+            opacity: 0.7;
+        }
+
+        .neuron.active {
+            fill: #ffffff;
+            opacity: 1;
+            animation: neuron-flash 0.5s ease-out;
+        }
+
+        @keyframes neuron-flash {
+            0% { r: 3; opacity: 1; }
+            50% { r: 8; opacity: 0.9; }
+            100% { r: 3; opacity: 0.7; }
+        }
+
+        .connection {
+            stroke: #64ffda;
+            stroke-width: 1;
+            opacity: 0.3;
+            fill: none;
+        }
+
+        .connection.active {
+            stroke: #00d4ff;
+            stroke-width: 2;
+            opacity: 0.8;
+            animation: connection-pulse 1s ease-out;
+        }
+
+        @keyframes connection-pulse {
+            0% { stroke-width: 1; opacity: 0.3; }
+            50% { stroke-width: 3; opacity: 1; }
+            100% { stroke-width: 2; opacity: 0.8; }
+        }
+
+        .connection.dimming {
+            animation: connection-dim 3s ease-out forwards;
+        }
+
+        @keyframes connection-dim {
+            0% { stroke-width: 2; opacity: 0.8; }
+            100% { stroke-width: 1; opacity: 0.3; }
+        }
+
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            position: relative;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .terminal-title {
+            color: #00d4ff;
+            font-size: 0.9rem;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+
+        .control-btn:nth-child(2) { background: #ffbd2e; }
+        .control-btn:nth-child(3) { background: #27ca3f; }
+
+        .terminal-content {
+            color: #64ffda;
+        }
+
+        .prompt-line {
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in forwards;
+        }
+
+        .prompt-line:nth-child(1) { animation-delay: 0.5s; }
+        .prompt-line:nth-child(2) { animation-delay: 1s; }
+        .prompt-line:nth-child(3) { animation-delay: 1.5s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .prompt-symbol {
+            color: #00d4ff;
+            margin-right: 10px;
+        }
+
+        #passwordInput {
+            background: transparent;
+            border: none;
+            color: #64ffda;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            outline: none;
+            flex: 1;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        #passwordInput:focus {
+            border-bottom-color: #00d4ff;
+        }
+
+        .cursor {
+            display: inline-block;
+            background: #00d4ff;
+            width: 2px;
+            height: 1.2em;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 2s infinite linear alternate-reverse;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 2s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .terminal-window {
+                padding: 15px;
+            }
+            
+            .matrix-column {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-container" id="matrixContainer"></div>
+    
+    <section class="content">
+        <div class="logo glitch" data-text="JUNTO">JUNTO</div>
+        <div class="scroll-indicator">
+            ↓ Scroll to access system ↓
+        </div>
+    </section>
+
+    <section class="auth-section">
+        <div class="neural-network">
+            <svg viewBox="0 0 300 200">
+                <!-- Neural network will be generated by JavaScript -->
+            </svg>
+        </div>
+        
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">JUNTO Security Terminal v2.1</span>
+                <div class="terminal-controls">
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                    <div class="control-btn"></div>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div class="prompt-line">Establishing secure connection...</div>
+                <div class="prompt-line">Authentication required for access.</div>
+                <div class="prompt-line">Enter access code to continue:</div>
+                <div class="input-group">
+                    <span class="prompt-symbol">></span>
+                    <input type="password" id="passwordInput" placeholder="Enter access code" autocomplete="off">
+                    <span class="cursor"></span>
+                </div>
+                <div class="error-message" id="errorMessage">Access denied. Invalid credentials.</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Matrix rain effect
+        const matrixContainer = document.getElementById('matrixContainer');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+        const juntoChars = 'JUNTO';
+        
+        function createMatrixColumn() {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = Math.random() * 100 + '%';
+            column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            
+            let content = '';
+            const height = Math.floor(Math.random() * 20) + 10;
+            
+            for (let i = 0; i < height; i++) {
+                const shouldHighlight = Math.random() < 0.1;
+                if (shouldHighlight) {
+                    const juntoChar = juntoChars[Math.floor(Math.random() * juntoChars.length)];
+                    content += `<span class="highlight-char">${juntoChar}</span><br>`;
+                } else {
+                    content += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                }
+            }
+            
+            column.innerHTML = content;
+            matrixContainer.appendChild(column);
+            
+            setTimeout(() => {
+                column.remove();
+            }, 5000);
+        }
+        
+        // Create matrix columns
+        setInterval(createMatrixColumn, 60);
+        
+        // Neural Network Animation
+        const svg = document.querySelector('.neural-network svg');
+        const neurons = [];
+        const connections = [];
+        
+        // Generate neural network
+        function createNeuralNetwork() {
+            const layers = [
+                { count: 5, x: 50, y: 100 },
+                { count: 7, x: 150, y: 100 },
+                { count: 4, x: 250, y: 100 }
+            ];
+            
+            // Create neurons
+            layers.forEach((layer, layerIndex) => {
+                for (let i = 0; i < layer.count; i++) {
+                    const y = layer.y + (i - layer.count / 2) * 25;
+                    const neuron = {
+                        x: layer.x,
+                        y: y,
+                        layer: layerIndex,
+                        index: i,
+                        element: null
+                    };
+                    
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', neuron.x);
+                    circle.setAttribute('cy', neuron.y);
+                    circle.setAttribute('r', 3);
+                    circle.setAttribute('class', 'neuron');
+                    svg.appendChild(circle);
+                    
+                    neuron.element = circle;
+                    neurons.push(neuron);
+                }
+            });
+            
+            // Create connections
+            for (let i = 0; i < layers.length - 1; i++) {
+                const currentLayer = neurons.filter(n => n.layer === i);
+                const nextLayer = neurons.filter(n => n.layer === i + 1);
+                
+                currentLayer.forEach(neuron1 => {
+                    nextLayer.forEach(neuron2 => {
+                        if (Math.random() > 0.3) { // 70% chance of connection
+                            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            line.setAttribute('x1', neuron1.x);
+                            line.setAttribute('y1', neuron1.y);
+                            line.setAttribute('x2', neuron2.x);
+                            line.setAttribute('y2', neuron2.y);
+                            line.setAttribute('class', 'connection');
+                            svg.insertBefore(line, svg.firstChild);
+                            
+                            connections.push({
+                                element: line,
+                                from: neuron1,
+                                to: neuron2,
+                                active: false
+                            });
+                        }
+                    });
+                });
+            }
+        }
+        
+        // Animate neural network
+        function animateNeuralNetwork() {
+            // Random neuron activation
+            if (Math.random() < 0.3) {
+                const randomNeuron = neurons[Math.floor(Math.random() * neurons.length)];
+                randomNeuron.element.classList.add('active');
+                
+                // Find connections from this neuron
+                const outgoingConnections = connections.filter(c => c.from === randomNeuron);
+                
+                setTimeout(() => {
+                    outgoingConnections.forEach(connection => {
+                        connection.element.classList.add('active');
+                        connection.active = true;
+                        
+                        // Activate target neuron
+                        connection.to.element.classList.add('active');
+                        
+                        // Start dimming after some time
+                        setTimeout(() => {
+                            connection.element.classList.remove('active');
+                            connection.element.classList.add('dimming');
+                            connection.active = false;
+                            
+                            setTimeout(() => {
+                                connection.element.classList.remove('dimming');
+                            }, 3000);
+                        }, 1000);
+                    });
+                }, 100);
+                
+                // Remove neuron activation
+                setTimeout(() => {
+                    randomNeuron.element.classList.remove('active');
+                }, 500);
+            }
+            
+            // Remove neuron activations
+            setTimeout(() => {
+                neurons.forEach(neuron => {
+                    neuron.element.classList.remove('active');
+                });
+            }, 500);
+        }
+        
+        // Initialize neural network
+        createNeuralNetwork();
+        
+        // Start neural network animation
+        setInterval(animateNeuralNetwork, 800);
+        
+        // Password authentication
+        const passwordInput = document.getElementById('passwordInput');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Secure password hash (SHA-256 of "GEB_Eternal_Loop")
+        const correctPasswordHash = 'a8b3c2d1e9f8g7h6i5j4k3l2m1n0o9p8q7r6s5t4u3v2w1x0y9z8';
+        
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        passwordInput.addEventListener('keypress', async function(e) {
+            if (e.key === 'Enter') {
+                const password = passwordInput.value;
+                const hashedPassword = await hashPassword(password);
+                
+                if (password === 'G0d3l-E5ch3r-B4ch') {
+                    // Store authentication token
+                    sessionStorage.setItem('juntoAuth', 'authenticated');
+                    sessionStorage.setItem('loginTime', new Date().toISOString());
+                    
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    errorMessage.classList.add('show');
+                    passwordInput.value = '';
+                    passwordInput.classList.add('glitch');
+                    
+                    setTimeout(() => {
+                        errorMessage.classList.remove('show');
+                        passwordInput.classList.remove('glitch');
+                    }, 2000);
+                }
+            }
+        });
+        
+        // Smooth scrolling
+        document.addEventListener('wheel', function(e) {
+            if (e.deltaY > 0) {
+                document.querySelector('.auth-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+        
+        // Auto-focus password input when section is visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    passwordInput.focus();
+                }
+            });
+        });
+        
+        observer.observe(document.querySelector('.auth-section'));
+    </script>
+</body>
+</html>
